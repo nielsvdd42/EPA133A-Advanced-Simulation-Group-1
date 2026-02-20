@@ -1,27 +1,16 @@
-# Example README File
+# README File
 
 Created by:
-|Group Number|X|
+|Group Number 1
 |:---:|:-------:|
-|Name| Student Number|
-|Name| Student Number|
-|Name| Student Number|
-|Name| Student Number|
-|Name| Student Number|
+Niels van den Dool (5026717)
+Eli Kapteijn (6587380)
+Nick Schreurs (6581951)
+Lieke Wahlen (5179564)
+Mirte Wildeboer (5326265)
 
-## Introduction
 
-In the folder (EPA133a-Gxx-Ax), you place your lab submission.
-
-Every project should have a README file to help a first-time user understand what it is about and how they might be able to use it.
 
 ## How to Use
 
-Include whatever you think is necessary for someone to understand your work. The README file is usually the first file someone will see and open. It doesn't need to explain what might be obvious, but it should point out the most important things someone looking at your work should know. What is your work for? What are the most important files? Who (if anyone) funded the project?
-
-There are a number of folders provided to structure your work. Use the ones that fit your needs. No all folders have to be filled. 
-
-### Format
-
-Most README files for data or software projects are now written in Markdown format, like this document. There are some different flavours, but they are based on the same logic – being easy to write. 
-Use Markdown format for your README file as well. 
+Run the notebooks in order from 0 to 2. The output is sent to the data/processed which can be used as input for the Java model. 
