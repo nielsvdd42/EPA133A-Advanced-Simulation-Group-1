@@ -57,12 +57,24 @@ class Bridge(Infra):
         self.condition = condition
 
         # TODO
-        self.delay_time = self.random.randrange(0, 10)
+        self.delay_time = self.set_delay_time()
         # print(self.delay_time)
 
     # TODO
     def get_delay_time(self):
         return self.delay_time
+
+    def set_delay_time(self):
+        match self.length:
+            case n if n < 10:
+                return self.random.uniform(10,20)
+            case n if n < 50:
+                return self.random.uniform(15,60)
+            case n if n < 200:
+                return self.random.uniform(45, 90)
+            case n if n >= 200:
+                return self.random.triangular(1,2,4)
+
 
 
 # ---------------------------------------------------------------

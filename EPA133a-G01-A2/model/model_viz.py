@@ -49,6 +49,7 @@ def agent_portrayal(agent):
     elif isinstance(agent, Bridge):
         portrayal["Color"] = "dodgerblue"
         portrayal["r"] = max(agent.vehicle_count * 4, 2)
+        portrayal["Text"] = agent.condition
 
     # define text labels
     if isinstance(agent, Source) or isinstance(agent, Sink):
