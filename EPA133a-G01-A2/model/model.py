@@ -63,6 +63,7 @@ class BangladeshModel(Model):
         self.space = None
         self.sources = []
         self.sinks = []
+        self.scenario1 = {'A': 0.5, 'B': 0.5, 'C':0.5, 'D':0.05}
 
         self.generate_model()
 
@@ -73,7 +74,7 @@ class BangladeshModel(Model):
         Warning: the labels are the same as the csv column labels
         """
 
-        df = pd.read_csv('../data/demo-1.csv')
+        df = pd.read_csv('../data/demo-2a.csv')
 
         # a list of names of roads to be generated
         roads = ['N1']
@@ -136,7 +137,7 @@ class BangladeshModel(Model):
                     self.sources.append(agent.unique_id)
                     self.sinks.append(agent.unique_id)
                 elif model_type == 'bridge':
-                    agent = Bridge(row['id'], self, row['length'], row['name'], row['road'])
+                    agent = Bridge(row['id'], self, row['length'], row['name'], row['road'], condition=row['condition'], broken_chance=self.scenario1[row['condition']])
                 elif model_type == 'link':
                     agent = Link(row['id'], self, row['length'], row['name'], row['road'])
 

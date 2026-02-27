@@ -51,18 +51,47 @@ class Bridge(Infra):
     """
 
     def __init__(self, unique_id, model, length=0,
-                 name='Unknown', road_name='Unknown', condition='Unknown'):
+                 name='Unknown', road_name='Unknown', condition='Unknown', broken_chance=0):
         super().__init__(unique_id, model, length, name, road_name)
 
         self.condition = condition
-
-        # TODO
-        self.delay_time = self.random.randrange(0, 10)
+        self.broken_chance = broken_chance
+        self.state = self.set_broken_bridge()
+        self.delay_time = self.set_delay_time()
         # print(self.delay_time)
 
-    # TODO
+    class State(Enum):
+        HEALED = 1
+        BROKEN = 2
+
     def get_delay_time(self):
         return self.delay_time
+
+    def set_broken_bridge(self):
+        if self.random.random() < self.broken_chance:
+            print('Bridge is fucking broken')
+            return Bridge.State.BROKEN
+
+        else:
+            print('Bridge is whole :)')
+            return Bridge.State.HEALED
+
+
+
+    def set_delay_time(self):
+        if self.State.HEALED:
+            return 0
+        else:
+            match self.length:
+                case n if n < 10:
+                    return self.random.uniform(10,20)
+                case n if n < 50:
+                    return self.random.uniform(15,60)
+                case n if n < 200:
+                    return self.random.uniform(45, 90)
+                case n if n >= 200:
+                    return self.random.triangular(1,2,4)
+
 
 
 # ---------------------------------------------------------------
