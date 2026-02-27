@@ -65,6 +65,7 @@ class Bridge(Infra):
         BROKEN = 2
 
     def get_delay_time(self):
+        self.delay_time = self.set_delay_time()
         return self.delay_time
 
     def set_broken_bridge(self):
@@ -79,7 +80,7 @@ class Bridge(Infra):
 
 
     def set_delay_time(self):
-        if self.State.HEALED:
+        if self.State == Bridge.State.HEALED:
             return 0
         else:
             match self.length:
@@ -302,6 +303,10 @@ class Vehicle(Agent):
             # arrive at the sink
             self.arrive_at_next(next_infra, 0)
             self.removed_at_step = self.model.schedule.steps
+
+            driving_time = self.removed_at_step - self.generated_at_step
+            self.model.completed_trip_times.append(driving_time)
+
             self.location.remove(self)
             return
         elif isinstance(next_infra, Bridge):
