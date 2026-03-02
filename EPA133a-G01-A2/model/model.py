@@ -64,7 +64,7 @@ class BangladeshModel(Model):
 
     step_time = 1
 
-    def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0, scenario={}):
+    def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0, scenario={'A': 0, 'B': 0, 'C': 0, 'D': 0.05}):
 
         self.schedule = BaseScheduler(self)
         self.running = True
