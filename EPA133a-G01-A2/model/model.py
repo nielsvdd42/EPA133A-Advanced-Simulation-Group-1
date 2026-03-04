@@ -64,7 +64,7 @@ class BangladeshModel(Model):
 
     step_time = 1
 
-    def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0, scenario=None):
+    def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0, scenario={'A': 0.00, 'B': 0.00, 'C':0.00, 'D':0.05}):
 
         self.schedule = BaseScheduler(self)
         self.running = True
@@ -89,7 +89,7 @@ class BangladeshModel(Model):
         Warning: the labels are the same as the csv column labels
         """
 
-        df = pd.read_csv('../data/demo-2a.csv')
+        df = pd.read_csv('../data/data_N1.csv')
 
         # a list of names of roads to be generated
         roads = ['N1']
