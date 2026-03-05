@@ -15,9 +15,9 @@ run_length = 5 * 24 * 60
 # run time 1000 ticks
 # run_length = 1000
 
-
+#Number of simulations to run for every seed
 simulations = 10
-
+#Scenarios
 scenarios = [{'A': 0.00, 'B': 0.00, 'C':0.00, 'D':0.00},
              {'A': 0.00, 'B': 0.00, 'C':0.00, 'D':0.05},
              {'A': 0.00, 'B': 0.00, 'C':0.00, 'D':0.10},
@@ -42,7 +42,6 @@ for scenario in scenarios:
         results_df = sim_model.datacollector.get_model_vars_dataframe()
         results_hihi.append(results_df.iloc[-1].Average_Driving_Time)
         seed = seed + 1
-        # results_df.append(results_df)
     scenario_result = pd.DataFrame(results_hihi, index=np.arange(12, 22, 1), columns=['Average Driving Time'])
     scenario_result.to_csv(f"../experiment/average_driving_times_scenario{scenario_i}.csv", index_label='Seed')
     scenario_i = scenario_i + 1
