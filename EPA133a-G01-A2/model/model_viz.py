@@ -44,11 +44,11 @@ def agent_portrayal(agent):
 
     elif isinstance(agent, Link):
         portrayal["Color"] = "Tan"
-        portrayal["r"] = max(agent.vehicle_count * 4, 2)
+        portrayal["r"] = max(agent.vehicle_count * 20, 2)
 
     elif isinstance(agent, Bridge):
         portrayal["Color"] = "dodgerblue"
-        portrayal["r"] = max(agent.vehicle_count * 4, 2)
+        portrayal["r"] = max(agent.vehicle_count * 20, 2)
 
     # define text labels
     if isinstance(agent, Source) or isinstance(agent, Sink):
