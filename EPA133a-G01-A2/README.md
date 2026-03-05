@@ -1,24 +1,29 @@
 # Example README File
 
-Created by: EPA133a Group xx
+Created by: EPA133a Group 01
 
-|    Name     | Student Number |
-| :---------: | :------------- |
-| Mary White  | 1234567        |
-| David Brown | 7654321        |
+|        Name        | Student Number |
+|:------------------:|:---------------|
+| Niels van den Dool | 5026717        |
+|    Eli Kapteijn    | 6587380        |
+|    Nick Schreurs    | 6581951        |
+|    Lieke Wahlen    | 5179564        |
+|    Mirte Wildeboer    | 5326265        |
+
 
 ## Introduction
 
-Every project should have a README file to help a first-time user understand what it is about and how they might be able to use it. This file is where you (as a group) shall provide the information needed by the TAs to evaluate and grade your work.
+Every project should have a README file to help a first-time user understand what it is about and how they might be able to use it. 
+This file is where you (as a group) shall provide the information needed by the TAs to evaluate and grade your work.
 
 If you are looking for information about the Demo model of Assignment 2, navigate to the [model/README.md](model/README.md) in the [model](model) directory. Have **fun** modeling in Python!
 
 ## How to Use
 
-Include whatever you think is necessary for someone to understand your work. The README file is usually the first file someone will see and open. It doesn't need to explain what might be obvious, but it should point out the most important things for someone looking at your work. For example, how to launch your program, what are the main files, where to find them, etc.
+1. To prepare the bridges dataset from Bangladesh, the notebook [notebooks/1_data_cleaning.ipynb](notebooks/1_data_cleaning.ipynb) was used.
+After running this notebook, a CSV-file (comma-separated values) is generated that can be used as input for the model provided in this assignment.
+2. Run the [model/model_run.py](model/model_run.py) with the parameters for scenarios, amount of simulations, amount of model steps and starting seed.
+The output of this model can be found in the folder [experiment](experiment) where for each scenario a different CSV-file is generated with the average driving time for each simulation (identified with the different seeds).
+3. To analyse the data and include visualisations in the report, an additional notebook [notebooks/2_results_scenario.ipynb](notebooks/2_results_scenario.ipynb) was made/used.
 
-### Format
-
-Most README files for data or software projects are now written in Markdown format, like this document. There are some different flavours, but they are easy to write. See here for more information https://www.markdownguide.org/basic-syntax
-
-Most IDEs can render Markdown files directly.
+The report can be found in the [report](report) folder. Happy reading!
