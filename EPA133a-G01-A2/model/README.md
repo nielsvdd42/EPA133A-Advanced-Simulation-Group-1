@@ -6,6 +6,17 @@ Yilin HUANG
 Email:
 y.huang@tudelft.nl
 
+Edited by:
+
+|        Name        | Student Number |
+|:------------------:|:---------------|
+| Niels van den Dool | 5026717        |
+|    Eli Kapteijn    | 6587380        |
+|    Nick Schreurs    | 6581951        |
+|    Lieke Wahlen    | 5179564        |
+|    Mirte Wildeboer    | 5326265        |
+
+
 Version:
 1.1
 
@@ -51,11 +62,11 @@ To install the requirements, open a terminal/command line window in PyCharm and 
 
 - [model.py](model.py): Contains the model `BangladeshModel` which is a subclass of Mesa `Model`. It reads a `csv` file with specific format for (transport) model generation. (See the README in the `data` directory for data format.) In addition to dynamic behavior, each model component instance (i.e., object) also has geo-location variables, i.e. latitude and longitude in Decimal Degrees (DD). The given bounds of the latitude and longitude of all objects are translated into the bounds of the HTML5 canvas, which is used in case the visualization is launched.
 
-  In this file, you modify the model generation and add your own routines.
+  In this file, the model was adjusted so it ran 8 scenarios for 10 seeds each, while collecting the average delay time using the built-in DataCollector from mesa.
 
 - [components.py](components.py): Contains the model component definitions for the (main) model. Check the file carefully to see which components are already defined.
 
-  In this file, you modify and add your own components.
+  In this file, the several components were modified so bridges could have a random delay time.
 
 - [model_viz.py](model_viz.py): Sets up the visualization; uses the `SimpleCanvas` element defined. Calls the model. Run the visualization server.
 

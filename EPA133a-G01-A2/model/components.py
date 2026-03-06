@@ -61,6 +61,9 @@ class Bridge(Infra):
         # print(self.delay_time)
 
     class State(Enum):
+        """
+        State enum for setting the state of bridges
+        """
         HEALED = 1
         BROKEN = 2
 
@@ -69,8 +72,11 @@ class Bridge(Infra):
         return self.delay_time
 
     def set_broken_bridge(self):
+        """
+        Called while initializing bridges, determining whether a bridge is broken or not
+        """
         if self.random.random() < self.broken_chance:
-            print('Bridge is fucking broken')
+            print('Bridge is **** broken')
             return Bridge.State.BROKEN
 
         else:
@@ -80,6 +86,10 @@ class Bridge(Infra):
 
 
     def set_delay_time(self):
+        """
+        Calculates the delay time based on random draws from the distributions
+        specified in the assignment
+        """
         if self.State == Bridge.State.HEALED:
             return 0
         else:
