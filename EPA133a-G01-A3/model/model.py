@@ -119,7 +119,7 @@ class BangladeshModel(Model):
         # ContinuousSpace from the Mesa package;
         # not to be confused with the SimpleContinuousModule visualization
         self.space = ContinuousSpace(x_max, y_max, True, x_min, y_min)
-        network_nodes = {"bridges": [], "sourcesinks": [], "intersections": [], "links": []}
+        network_nodes = {"bridges": [], "sourcesinks": [], "intersections": [], "links": {}}
 
         for df in df_objects_all:
             for _, row in df.iterrows():  # index, row in ...
@@ -150,7 +150,7 @@ class BangladeshModel(Model):
                     network_nodes["bridges"].append((row['id'], row['length'],row['lon'], row['lat']))
                 elif model_type == 'link':
                     agent = Link(row['id'], self, row['length'], name, row['road'])
-                    network_nodes["links"].append((row['id'], row['length']))
+                    network_nodes["links"][row['id']] = row['length']
                 elif model_type == 'intersection':
                     if not row['id'] in self.schedule._agents:
                         agent = Intersection(row['id'], self, row['length'], name, row['road'])
@@ -179,17 +179,16 @@ class BangladeshModel(Model):
         self.G.add_nodes_from(intersections_nodes)
 
         links = network_dict["links"]
-        link_edges = [(link[0]) for link in links]
 
         paths = self.path_ids_dict
-        path_keys = list(paths.keys())
-        path = paths[path_keys[0]]
         edge_list = []
-        for i in range(len(path) - 1):
-            if path.iloc[i] in link_edges:
-                print("Yes", path.iloc[i])
-
+        for path_key in paths:
+            path = paths[path_key]
+            for i in range(len(path) - 1):
+                if path.iloc[i] in links:
+                    edge_list.append((path.iloc[i-1], path.iloc[i+1], links[path.iloc[i]]))
         print(edge_list)
+        self.G.add_weighted_edges_from(edge_list)
 
 
 
