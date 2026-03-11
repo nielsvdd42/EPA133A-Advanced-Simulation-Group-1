@@ -65,6 +65,7 @@ class BangladeshModel(Model):
         self.space = None
         self.sources = []
         self.sinks = []
+        self.G = nx.Graph()
 
         self.generate_model()
 
@@ -118,6 +119,7 @@ class BangladeshModel(Model):
         # ContinuousSpace from the Mesa package;
         # not to be confused with the SimpleContinuousModule visualization
         self.space = ContinuousSpace(x_max, y_max, True, x_min, y_min)
+        network_nodes = {"bridges": [], "sourcesinks": [], "intersections": [], "links": []}
 
         for df in df_objects_all:
             for _, row in df.iterrows():  # index, row in ...
@@ -142,13 +144,17 @@ class BangladeshModel(Model):
                     agent = SourceSink(row['id'], self, row['length'], name, row['road'])
                     self.sources.append(agent.unique_id)
                     self.sinks.append(agent.unique_id)
+                    network_nodes["sourcesinks"].append((row['id'], row['length'], row['lon'], row['lat']))
                 elif model_type == 'bridge':
                     agent = Bridge(row['id'], self, row['length'], name, row['road'], row['condition'])
+                    network_nodes["bridges"].append((row['id'], row['length'],row['lon'], row['lat']))
                 elif model_type == 'link':
                     agent = Link(row['id'], self, row['length'], name, row['road'])
+                    network_nodes["links"].append((row['id'], row['length']))
                 elif model_type == 'intersection':
                     if not row['id'] in self.schedule._agents:
                         agent = Intersection(row['id'], self, row['length'], name, row['road'])
+                        network_nodes["intersections"].append((row['id'], row['length'], row['lon'], row['lat']))
 
                 if agent:
                     self.schedule.add(agent)
@@ -156,6 +162,38 @@ class BangladeshModel(Model):
                     x = row['lon']
                     self.space.place_agent(agent, (x, y))
                     agent.pos = (x, y)
+        self.generate_network(network_nodes)
+
+    def generate_network(self, network_dict):
+        #Add bridges as nodes to network
+        bridges = network_dict["bridges"]
+        bridges_with_length = [(bridge[0], {'weight': bridge[1], 'type': 'bridge'}) for bridge in bridges]
+        self.G.add_nodes_from(bridges_with_length)
+
+        sourcesinks = network_dict["sourcesinks"]
+        sourcesinks_nodes = [(sourcesink[0], {'weight': sourcesink[1], 'type': 'SoSi'}) for sourcesink in sourcesinks]
+        self.G.add_nodes_from(sourcesinks_nodes)
+
+        intersections = network_dict["intersections"]
+        intersections_nodes = [(intersection[0], {'weight': intersection[1], 'type': 'intersection'}) for intersection in intersections]
+        self.G.add_nodes_from(intersections_nodes)
+
+        links = network_dict["links"]
+        link_edges = [(link[0]) for link in links]
+
+        paths = self.path_ids_dict
+        path_keys = list(paths.keys())
+        path = paths[path_keys[0]]
+        edge_list = []
+        for i in range(len(path) - 1):
+            if path.iloc[i] in link_edges:
+                print("Yes", path.iloc[i])
+
+        print(edge_list)
+
+
+
+
 
     def get_random_route(self, source):
         """
