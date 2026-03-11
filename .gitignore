@@ -2,5 +2,4 @@
 .venv
 .DS_store
 requirements.txt
-EPA133a-G01-A2/model/__pycache__/
-EPA133a-G01-A2/model/ContinuousSpace/__pycache__/
+__pycache__/
