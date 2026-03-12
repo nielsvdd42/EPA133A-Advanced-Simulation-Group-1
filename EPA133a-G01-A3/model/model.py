@@ -191,9 +191,6 @@ class BangladeshModel(Model):
         self.G.add_weighted_edges_from(edge_list)
 
 
-
-
-
     def get_random_route(self, source):
         """
         pick up a random route given an origin
@@ -207,7 +204,19 @@ class BangladeshModel(Model):
 
     # TODO
     def get_route(self, source):
-        return self.get_straight_route(source)
+        while True:
+            # different source and sink
+            sink = self.random.choice(self.sinks)
+            if sink is not source:
+                break
+        if (source, sink) in self.path_ids_dict:
+            print("route exists joepiedepoepie")
+            return self.path_ids_dict[source, sink]
+            return self.path_ids_dict[source, sink]
+        else:
+            shortest_path =  nx.shortest_path(self.G, source=source, target=sink, weight='weight')
+            self.path_ids_dict[source, sink] = shortest_path
+            return shortest_path
 
     def get_straight_route(self, source):
         """
