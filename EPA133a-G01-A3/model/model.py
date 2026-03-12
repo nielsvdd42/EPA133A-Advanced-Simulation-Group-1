@@ -214,7 +214,6 @@ class BangladeshModel(Model):
                 break
         return self.path_ids_dict[source, sink]
 
-    # TODO
     def get_route(self, source):
         while True:
             # different source and sink
