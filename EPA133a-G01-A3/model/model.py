@@ -1,6 +1,7 @@
 from mesa import Model
 from mesa.time import BaseScheduler
 from mesa.space import ContinuousSpace
+from mesa.datacollection import DataCollector
 from components import Source, Sink, SourceSink, Bridge, Link, Intersection
 import pandas as pd
 from collections import defaultdict
@@ -24,6 +25,12 @@ def set_lat_lon_bound(lat_min, lat_max, lon_min, lon_max, edge_ratio=0.02):
     y_min = lat_max + lat_edge
     return y_min, y_max, x_min, x_max
 
+def compute_avg_driving_time(model):
+    """Calculates the average driving time of completed trips."""
+    if len(model.completed_trip_times) == 0:
+        return 0.0
+    # print(model.completed_trip_times)
+    return sum(model.completed_trip_times) / len(model.completed_trip_times)
 
 # ---------------------------------------------------------------
 class BangladeshModel(Model):
@@ -57,7 +64,7 @@ class BangladeshModel(Model):
 
     file_name = '../data/demo-4.csv'
 
-    def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0):
+    def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0, scenario={'A': 0.00, 'B': 0.00, 'C':0.00, 'D':0.00}):
 
         self.schedule = BaseScheduler(self)
         self.running = True
@@ -65,9 +72,14 @@ class BangladeshModel(Model):
         self.space = None
         self.sources = []
         self.sinks = []
+        self.scenario = scenario
+        self.completed_trip_times = []
         self.G = nx.Graph()
-
         self.generate_model()
+
+        self.datacollector = DataCollector(
+            model_reporters={"Average_Driving_Time": compute_avg_driving_time}
+        )
 
     def generate_model(self):
         """
@@ -212,7 +224,6 @@ class BangladeshModel(Model):
         if (source, sink) in self.path_ids_dict:
             print("route exists joepiedepoepie")
             return self.path_ids_dict[source, sink]
-            return self.path_ids_dict[source, sink]
         else:
             shortest_path =  nx.shortest_path(self.G, source=source, target=sink, weight='weight')
             self.path_ids_dict[source, sink] = shortest_path
@@ -229,5 +240,7 @@ class BangladeshModel(Model):
         Advance the simulation by one step.
         """
         self.schedule.step()
+        self.datacollector.collect(self)
+
 
 # EOF -----------------------------------------------------------
