@@ -51,18 +51,56 @@ class Bridge(Infra):
     """
 
     def __init__(self, unique_id, model, length=0,
-                 name='Unknown', road_name='Unknown', condition='Unknown'):
+                 name='Unknown', road_name='Unknown', condition='Unknown', broken_chance=0):
         super().__init__(unique_id, model, length, name, road_name)
 
         self.condition = condition
-
-        # TODO
-        self.delay_time = self.random.randrange(0, 10)
+        self.broken_chance = broken_chance
+        self.state = self.set_broken_bridge()
+        self.delay_time = self.set_delay_time()
         # print(self.delay_time)
 
-    # TODO
+    class State(Enum):
+        """
+        State enum for setting the state of bridges
+        """
+        HEALED = 1
+        BROKEN = 2
+
     def get_delay_time(self):
+        self.delay_time = self.set_delay_time()
         return self.delay_time
+
+    def set_broken_bridge(self):
+        """
+        Called while initializing bridges, determining whether a bridge is broken or not
+        """
+        if self.random.random() < self.broken_chance:
+            print('Bridge is **** broken')
+            return Bridge.State.BROKEN
+
+        else:
+            print('Bridge is whole :)')
+            return Bridge.State.HEALED
+
+
+    def set_delay_time(self):
+        """
+        Calculates the delay time based on random draws from the distributions
+        specified in the assignment
+        """
+        if self.State == Bridge.State.HEALED:
+            return 0
+        else:
+            match self.length:
+                case n if n < 10:
+                    return self.random.uniform(10,20)
+                case n if n < 50:
+                    return self.random.uniform(15,60)
+                case n if n < 200:
+                    return self.random.uniform(45, 90)
+                case n if n >= 200:
+                    return self.random.triangular(60,240,120)
 
 
 # ---------------------------------------------------------------
@@ -249,7 +287,7 @@ class Vehicle(Agent):
         """
         To print the vehicle trajectory at each step
         """
-        print(self)
+        #print(self)
 
     def drive(self):
 
@@ -278,10 +316,15 @@ class Vehicle(Agent):
             # arrive at the sink
             self.arrive_at_next(next_infra, 0)
             self.removed_at_step = self.model.schedule.steps
+
+            driving_time = self.removed_at_step - self.generated_at_step
+            self.model.completed_trip_times.append(driving_time)
+
             self.location.remove(self)
             return
         elif isinstance(next_infra, Bridge):
-            self.waiting_time = next_infra.get_delay_time()
+            if next_infra.state == Bridge.State.BROKEN:
+                self.waiting_time = next_infra.get_delay_time()
             if self.waiting_time > 0:
                 # arrive at the bridge and wait
                 self.arrive_at_next(next_infra, 0)
