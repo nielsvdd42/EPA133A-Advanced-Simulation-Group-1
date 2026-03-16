@@ -1,10 +1,11 @@
 from mesa import Model
 from mesa.time import BaseScheduler
 from mesa.space import ContinuousSpace
+from mesa.datacollection import DataCollector
 from components import Source, Sink, SourceSink, Bridge, Link, Intersection
 import pandas as pd
 from collections import defaultdict
-
+import networkx as nx
 
 # ---------------------------------------------------------------
 def set_lat_lon_bound(lat_min, lat_max, lon_min, lon_max, edge_ratio=0.02):
@@ -24,6 +25,12 @@ def set_lat_lon_bound(lat_min, lat_max, lon_min, lon_max, edge_ratio=0.02):
     y_min = lat_max + lat_edge
     return y_min, y_max, x_min, x_max
 
+def compute_avg_driving_time(model):
+    """Calculates the average driving time of completed trips."""
+    if len(model.completed_trip_times) == 0:
+        return 0.0
+    # print(model.completed_trip_times)
+    return sum(model.completed_trip_times) / len(model.completed_trip_times)
 
 # ---------------------------------------------------------------
 class BangladeshModel(Model):
@@ -57,7 +64,7 @@ class BangladeshModel(Model):
 
     file_name = '../data/demo-4.csv'
 
-    def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0):
+    def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0, scenario={'A': 0.00, 'B': 0.00, 'C':0.00, 'D':0.00}):
 
         self.schedule = BaseScheduler(self)
         self.running = True
@@ -65,8 +72,14 @@ class BangladeshModel(Model):
         self.space = None
         self.sources = []
         self.sinks = []
-
+        self.scenario = scenario
+        self.completed_trip_times = []
+        self.G = nx.Graph()
         self.generate_model()
+
+        self.datacollector = DataCollector(
+            model_reporters={"Average_Driving_Time": compute_avg_driving_time}
+        )
 
     def generate_model(self):
         """
@@ -78,8 +91,7 @@ class BangladeshModel(Model):
         df = pd.read_csv(self.file_name)
 
         # a list of names of roads to be generated
-        # TODO You can also read in the road column to generate this list automatically
-        roads = ['N1', 'N2']
+        roads = list(df.road.unique())
 
         df_objects_all = []
         for road in roads:
@@ -118,6 +130,7 @@ class BangladeshModel(Model):
         # ContinuousSpace from the Mesa package;
         # not to be confused with the SimpleContinuousModule visualization
         self.space = ContinuousSpace(x_max, y_max, True, x_min, y_min)
+        network_nodes = {"bridges": [], "sourcesinks": [], "intersections": [], "links": {}}
 
         for df in df_objects_all:
             for _, row in df.iterrows():  # index, row in ...
@@ -142,13 +155,17 @@ class BangladeshModel(Model):
                     agent = SourceSink(row['id'], self, row['length'], name, row['road'])
                     self.sources.append(agent.unique_id)
                     self.sinks.append(agent.unique_id)
+                    network_nodes["sourcesinks"].append((row['id'], row['length'], row['lon'], row['lat']))
                 elif model_type == 'bridge':
                     agent = Bridge(row['id'], self, row['length'], name, row['road'], row['condition'])
+                    network_nodes["bridges"].append((row['id'], row['length'],row['lon'], row['lat']))
                 elif model_type == 'link':
                     agent = Link(row['id'], self, row['length'], name, row['road'])
+                    network_nodes["links"][row['id']] = row['length']
                 elif model_type == 'intersection':
                     if not row['id'] in self.schedule._agents:
                         agent = Intersection(row['id'], self, row['length'], name, row['road'])
+                        network_nodes["intersections"].append((row['id'], row['length'], row['lon'], row['lat']))
 
                 if agent:
                     self.schedule.add(agent)
@@ -156,6 +173,34 @@ class BangladeshModel(Model):
                     x = row['lon']
                     self.space.place_agent(agent, (x, y))
                     agent.pos = (x, y)
+        self.generate_network(network_nodes)
+
+    def generate_network(self, network_dict):
+        #Add bridges as nodes to network
+        bridges = network_dict["bridges"]
+        bridges_with_length = [(bridge[0], {'weight': bridge[1], 'type': 'bridge'}) for bridge in bridges]
+        self.G.add_nodes_from(bridges_with_length)
+
+        sourcesinks = network_dict["sourcesinks"]
+        sourcesinks_nodes = [(sourcesink[0], {'weight': sourcesink[1], 'type': 'SoSi'}) for sourcesink in sourcesinks]
+        self.G.add_nodes_from(sourcesinks_nodes)
+
+        intersections = network_dict["intersections"]
+        intersections_nodes = [(intersection[0], {'weight': intersection[1], 'type': 'intersection'}) for intersection in intersections]
+        self.G.add_nodes_from(intersections_nodes)
+
+        links = network_dict["links"]
+
+        paths = self.path_ids_dict
+        edge_list = []
+        for path_key in paths:
+            path = paths[path_key]
+            for i in range(len(path) - 1):
+                if path.iloc[i] in links:
+                    edge_list.append((path.iloc[i-1], path.iloc[i+1], links[path.iloc[i]]))
+        print(edge_list)
+        self.G.add_weighted_edges_from(edge_list)
+
 
     def get_random_route(self, source):
         """
@@ -168,9 +213,19 @@ class BangladeshModel(Model):
                 break
         return self.path_ids_dict[source, sink]
 
-    # TODO
     def get_route(self, source):
-        return self.get_straight_route(source)
+        while True:
+            # different source and sink
+            sink = self.random.choice(self.sinks)
+            if sink is not source:
+                break
+        if (source, sink) in self.path_ids_dict:
+            print("route exists joepiedepoepie")
+            return self.path_ids_dict[source, sink]
+        else:
+            shortest_path =  nx.shortest_path(self.G, source=source, target=sink, weight='weight')
+            self.path_ids_dict[source, sink] = shortest_path
+            return shortest_path
 
     def get_straight_route(self, source):
         """
@@ -183,5 +238,7 @@ class BangladeshModel(Model):
         Advance the simulation by one step.
         """
         self.schedule.step()
+        self.datacollector.collect(self)
+
 
 # EOF -----------------------------------------------------------
