@@ -1,3 +1,4 @@
+from matplotlib import pyplot as plt
 from mesa import Model
 from mesa.time import BaseScheduler
 from mesa.space import ContinuousSpace
@@ -131,7 +132,7 @@ class BangladeshModel(Model):
         # not to be confused with the SimpleContinuousModule visualization
         self.space = ContinuousSpace(x_max, y_max, True, x_min, y_min)
         network_nodes = {"bridges": [], "sourcesinks": [], "intersections": [], "links": {}}
-
+        coord_dict = {}
         for df in df_objects_all:
             for _, row in df.iterrows():  # index, row in ...
 
@@ -156,9 +157,11 @@ class BangladeshModel(Model):
                     self.sources.append(agent.unique_id)
                     self.sinks.append(agent.unique_id)
                     network_nodes["sourcesinks"].append((row['id'], row['length'], row['lon'], row['lat']))
+                    coord_dict[row['id']] = (row['lon'], row['lat'])
                 elif model_type == 'bridge':
                     agent = Bridge(row['id'], self, row['length'], name, row['road'], row['condition'])
                     network_nodes["bridges"].append((row['id'], row['length'],row['lon'], row['lat']))
+                    coord_dict[row['id']] = (row['lon'], row['lat'])
                 elif model_type == 'link':
                     agent = Link(row['id'], self, row['length'], name, row['road'])
                     network_nodes["links"][row['id']] = row['length']
@@ -166,6 +169,7 @@ class BangladeshModel(Model):
                     if not row['id'] in self.schedule._agents:
                         agent = Intersection(row['id'], self, row['length'], name, row['road'])
                         network_nodes["intersections"].append((row['id'], row['length'], row['lon'], row['lat']))
+                        coord_dict[row['id']] = (row['lon'], row['lat'])
 
                 if agent:
                     self.schedule.add(agent)
@@ -174,19 +178,30 @@ class BangladeshModel(Model):
                     self.space.place_agent(agent, (x, y))
                     agent.pos = (x, y)
         self.generate_network(network_nodes)
+        pos = {node: (data['lon'], data['lat']) for node, data in self.G.nodes(data=True)}
+        print(nx.is_connected(self.G), nx.number_connected_components(self.G))
+        connected_components = nx.connected_components(self.G)
+        compies = [len(c) for c in sorted(nx.connected_components(self.G), key=len, reverse=True)]
+        nx.draw_networkx(self.G, coord_dict,
+                               edge_color='lightgrey')
+        plt.xlim(91.7, 91.9)
+        plt.ylim(22.2, 22.5)
+        plt.savefig(f"compies.png", format="png")
+
+        print('jajahfaleglaelffa', compies)
 
     def generate_network(self, network_dict):
         #Add bridges as nodes to network
         bridges = network_dict["bridges"]
-        bridges_with_length = [(bridge[0], {'weight': bridge[1], 'type': 'bridge'}) for bridge in bridges]
+        bridges_with_length = [(bridge[0], {'weight': bridge[1], 'type': 'bridge', 'lon': bridge[2], 'lat': bridge[3]}) for bridge in bridges]
         self.G.add_nodes_from(bridges_with_length)
 
         sourcesinks = network_dict["sourcesinks"]
-        sourcesinks_nodes = [(sourcesink[0], {'weight': sourcesink[1], 'type': 'SoSi'}) for sourcesink in sourcesinks]
+        sourcesinks_nodes = [(sourcesink[0], {'weight': sourcesink[1], 'type': 'SoSi', 'lon': sourcesink[2], 'lat': sourcesink[3]}) for sourcesink in sourcesinks]
         self.G.add_nodes_from(sourcesinks_nodes)
 
         intersections = network_dict["intersections"]
-        intersections_nodes = [(intersection[0], {'weight': intersection[1], 'type': 'intersection'}) for intersection in intersections]
+        intersections_nodes = [(intersection[0], {'weight': intersection[1], 'type': 'intersection', 'lon': intersection[2], 'lat': intersection[3]}) for intersection in intersections]
         self.G.add_nodes_from(intersections_nodes)
 
         links = network_dict["links"]
