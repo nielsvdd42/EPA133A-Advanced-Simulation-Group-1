@@ -62,7 +62,7 @@ class Bridge(Infra):
 
     class State(Enum):
         """
-        State enum for setting the state of bridges
+        State enum for setting the state of bridges yas
         """
         HEALED = 1
         BROKEN = 2
