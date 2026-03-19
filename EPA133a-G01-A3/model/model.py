@@ -85,7 +85,7 @@ class BangladeshModel(Model):
 
     def generate_model(self):
         """
-        generate the simulation model according to the csv file component information
+        generate the simulation model and structures the data for networkX modelling according to the csv file component information
 
         Warning: the labels are the same as the csv column labels
         """
@@ -181,25 +181,12 @@ class BangladeshModel(Model):
         self.generate_network(network_nodes)
         pos = {}
         for node, data in self.G.nodes(data=True):
-            # print(node, data)
             pos[node] = (data['lon'], data['lat'])
-        # print(nx.is_connected(self.G), nx.number_connected_components(self.G))
-        # connected_components = nx.connected_components(self.G)
-        # compies = [len(c) for c in sorted(nx.connected_components(self.G), key=len, reverse=True)]
-        # nx.draw_networkx(self.G, coord_dict, edge_color='lightgrey')
-        # plt.xlim(91.7, 91.9)
-        # plt.ylim(22.2, 22.5)
-        # plt.savefig(f"compies.png", format="png")
-        # self.G = nx.relabel_nodes(self.G, str)
-        # net = Network(notebook=True, height="750px", width="100%", bgcolor="#222222", font_color="white")
-
-        # 3. Load the networkx graph
-        # net.from_nx(self.G)
-
-        # 4. Show/Save the interactive HTML file
-        # net.show("my_interactive_graph.html")
 
     def generate_network(self, network_dict):
+        """
+        Generate a networkX model from the specified network_dict
+        """
         #Add bridges as nodes to network
         bridges = network_dict["bridges"]
         bridges_with_length = [(bridge[0], {'weight': bridge[1], 'type': 'bridge', 'lon': bridge[2], 'lat': bridge[3]}) for bridge in bridges]
@@ -222,7 +209,6 @@ class BangladeshModel(Model):
             for i in range(len(path) - 1):
                 if path.iloc[i] in links:
                     edge_list.append((path.iloc[i-1], path.iloc[i+1], links[path.iloc[i]]))
-        # print(edge_list)
         self.G.add_weighted_edges_from(edge_list)
         print(self.G.edges(data=True))
         negative_edges = [(u, v, data) for u, v, data in self.G.edges(data=True) if data.get('weight', 0) < 0]
@@ -246,13 +232,16 @@ class BangladeshModel(Model):
         return self.path_ids_dict[source, sink]
 
     def get_route(self, source):
+        """
+        Picks a random sink and generates the shortest path from the specified source to this sink.
+        First looks up if a path has been generated before, otherwise generates new one from networkX model.
+        """
         while True:
             # different source and sink
             sink = self.random.choice(self.sinks)
             if sink is not source:
                 break
         if (source, sink) in self.path_ids_dict:
-            print("route exists joepiedepoepie")
             return self.path_ids_dict[source, sink]
         else:
             print(sink, source)

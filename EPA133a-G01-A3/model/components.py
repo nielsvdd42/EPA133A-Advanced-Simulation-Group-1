@@ -303,13 +303,21 @@ class Vehicle(Agent):
             # remain on the same object
             self.location_offset += distance
 
+    def get_next_id(self):
+        if self.location_index + 1 >= len(self.path_ids):
+            return None  # reached end
+        return self.path_ids.iloc[self.location_index + 1]
+
     def drive_to_next(self, distance):
         """
         vehicle shall move to the next object with the given distance
         """
 
         self.location_index += 1
-        next_id = self.path_ids[self.location_index]
+        next_id = self.get_next_id()
+        if next_id is None:
+            # stop moving, or reverse, or loop
+            return
         next_infra = self.model.schedule._agents[next_id]  # Access to protected member _agents
 
         if isinstance(next_infra, Sink):

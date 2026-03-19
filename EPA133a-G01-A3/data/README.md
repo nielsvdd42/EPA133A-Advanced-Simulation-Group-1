@@ -6,6 +6,17 @@ Yilin HUANG
 Email:
 y.huang@tudelft.nl
 
+Edited by:
+
+|        Name        | Student Number |
+|:------------------:|:---------------|
+| Niels van den Dool | 5026717        |
+|    Eli Kapteijn    | 6587380        |
+|    Nick Schreurs    | 6581951        |
+|    Lieke Wahlen    | 5179564        |
+|    Mirte Wildeboer    | 5326265        |
+
+
 Version:
 1.1
 
@@ -20,6 +31,7 @@ The simple transport model demo, see [../model/model.py](../model/model.py) for 
 |       road | On which road does the component belong to               |
 |         id | **Unique ID** of the component                           |
 | model_type | Type (i.e. class) of the model component to be generated |
+ | condition| Condition of the object, determines the change of breaking down|
 |       name | Name of the object                                       |
 |        lat | Latitude in Decimal Degrees                              |
 |        lon | Longitude in Decimal Degrees                             |
@@ -30,7 +42,5 @@ The column `road` is used by the model generation to classify model components b
 The column `model_type` is used by the model generation to identify which class of components to be generated. The `model_type` labels used in this column must be consistent with the labels in the `generate_model` routine.
 
 The rest of the information is used to instantiate the components (objects).
-
-You may change the data format and structure if the model generation (`generate_model`) routine is adapted accordingly.
 
 All data files contained in this directory are used as demonstration for model generation. They are not based on real data.
