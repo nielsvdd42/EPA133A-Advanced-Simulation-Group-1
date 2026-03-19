@@ -179,9 +179,9 @@ class BangladeshModel(Model):
                     self.space.place_agent(agent, (x, y))
                     agent.pos = (x, y)
         self.generate_network(network_nodes)
-        pos = {}
-        for node, data in self.G.nodes(data=True):
-            pos[node] = (data['lon'], data['lat'])
+        # pos = {}
+        # for node, data in self.G.nodes(data=True):
+        #     pos[node] = (data['lon'], data['lat'])
 
     def generate_network(self, network_dict):
         """
@@ -210,14 +210,14 @@ class BangladeshModel(Model):
                 if path.iloc[i] in links:
                     edge_list.append((path.iloc[i-1], path.iloc[i+1], links[path.iloc[i]]))
         self.G.add_weighted_edges_from(edge_list)
-        print(self.G.edges(data=True))
-        negative_edges = [(u, v, data) for u, v, data in self.G.edges(data=True) if data.get('weight', 0) < 0]
-
-        if negative_edges:
-            print(f"Warning: Found {len(negative_edges)} edges with negative weights!")
-            # Print the first 5 to see what the weights actually are
-            print(negative_edges[:5])
-        print(nx.shortest_path(self.G, 101361, 100001, weight='weight'))
+        # print(self.G.edges(data=True))
+        # negative_edges = [(u, v, data) for u, v, data in self.G.edges(data=True) if data.get('weight', 0) < 0]
+        #
+        # if negative_edges:
+        #     print(f"Warning: Found {len(negative_edges)} edges with negative weights!")
+        #     # Print the first 5 to see what the weights actually are
+        #     print(negative_edges[:5])
+        # print(nx.shortest_path(self.G, 101361, 100001, weight='weight'))
 
 
     def get_random_route(self, source):
