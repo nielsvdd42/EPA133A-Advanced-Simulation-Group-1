@@ -133,7 +133,6 @@ class BangladeshModel(Model):
         # not to be confused with the SimpleContinuousModule visualization
         self.space = ContinuousSpace(x_max, y_max, True, x_min, y_min)
         network_nodes = {"bridges": [], "sourcesinks": [], "intersections": [], "links": {}}
-        coord_dict = {}
         for df in df_objects_all:
             for _, row in df.iterrows():  # index, row in ...
 
@@ -158,11 +157,9 @@ class BangladeshModel(Model):
                     self.sources.append(agent.unique_id)
                     self.sinks.append(agent.unique_id)
                     network_nodes["sourcesinks"].append((row['id'], row['length'], row['lon'], row['lat']))
-                    coord_dict[row['id']] = (row['lon'], row['lat'])
                 elif model_type == 'bridge':
                     agent = Bridge(row['id'], self, row['length'], name, row['road'], condition=row['condition'], broken_chance=self.scenario[row['condition']])
                     network_nodes["bridges"].append((row['id'], row['length'],row['lon'], row['lat']))
-                    coord_dict[row['id']] = (row['lon'], row['lat'])
                 elif model_type == 'link':
                     agent = Link(row['id'], self, row['length'], name, row['road'])
                     network_nodes["links"][row['id']] = row['length']
@@ -170,7 +167,6 @@ class BangladeshModel(Model):
                     if not row['id'] in self.schedule._agents:
                         agent = Intersection(row['id'], self, row['length'], name, row['road'])
                         network_nodes["intersections"].append((row['id'], row['length'], row['lon'], row['lat']))
-                        coord_dict[row['id']] = (row['lon'], row['lat'])
 
                 if agent:
                     self.schedule.add(agent)
