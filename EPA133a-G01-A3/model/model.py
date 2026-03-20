@@ -133,7 +133,6 @@ class BangladeshModel(Model):
         # not to be confused with the SimpleContinuousModule visualization
         self.space = ContinuousSpace(x_max, y_max, True, x_min, y_min)
         network_nodes = {"bridges": [], "sourcesinks": [], "intersections": [], "links": {}}
-        coord_dict = {}
         for df in df_objects_all:
             for _, row in df.iterrows():  # index, row in ...
 
@@ -158,11 +157,9 @@ class BangladeshModel(Model):
                     self.sources.append(agent.unique_id)
                     self.sinks.append(agent.unique_id)
                     network_nodes["sourcesinks"].append((row['id'], row['length'], row['lon'], row['lat']))
-                    coord_dict[row['id']] = (row['lon'], row['lat'])
                 elif model_type == 'bridge':
                     agent = Bridge(row['id'], self, row['length'], name, row['road'], condition=row['condition'], broken_chance=self.scenario[row['condition']])
                     network_nodes["bridges"].append((row['id'], row['length'],row['lon'], row['lat']))
-                    coord_dict[row['id']] = (row['lon'], row['lat'])
                 elif model_type == 'link':
                     agent = Link(row['id'], self, row['length'], name, row['road'])
                     network_nodes["links"][row['id']] = row['length']
@@ -170,7 +167,6 @@ class BangladeshModel(Model):
                     if not row['id'] in self.schedule._agents:
                         agent = Intersection(row['id'], self, row['length'], name, row['road'])
                         network_nodes["intersections"].append((row['id'], row['length'], row['lon'], row['lat']))
-                        coord_dict[row['id']] = (row['lon'], row['lat'])
 
                 if agent:
                     self.schedule.add(agent)
@@ -210,14 +206,6 @@ class BangladeshModel(Model):
                 if path.iloc[i] in links:
                     edge_list.append((path.iloc[i-1], path.iloc[i+1], links[path.iloc[i]]))
         self.G.add_weighted_edges_from(edge_list)
-        # print(self.G.edges(data=True))
-        # negative_edges = [(u, v, data) for u, v, data in self.G.edges(data=True) if data.get('weight', 0) < 0]
-        #
-        # if negative_edges:
-        #     print(f"Warning: Found {len(negative_edges)} edges with negative weights!")
-        #     # Print the first 5 to see what the weights actually are
-        #     print(negative_edges[:5])
-        # print(nx.shortest_path(self.G, 101361, 100001, weight='weight'))
 
 
     def get_random_route(self, source):
@@ -244,7 +232,6 @@ class BangladeshModel(Model):
         if (source, sink) in self.path_ids_dict:
             return self.path_ids_dict[source, sink]
         else:
-            print(sink, source)
             shortest_path =  nx.shortest_path(self.G, source=source, target=sink, weight='weight')
             self.path_ids_dict[source, sink] = shortest_path
             return shortest_path
