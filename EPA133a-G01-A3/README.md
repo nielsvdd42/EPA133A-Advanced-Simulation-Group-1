@@ -23,7 +23,7 @@ Because bridges play a crucial role in Bangladesh's transport network and are vu
 ## How to Use
 
 **1. Prepare the Data**
-Run the `notebooks/data_FINALFINAL.ipynb` notebook to clean the Bangladesh bridges dataset. Executing this notebook generates the necessary CSV input file required for the simulation.
+Run the `notebooks/1_data_preparation.ipynb` notebook to prepare the Bangladesh bridges dataset. Executing this notebook generates the necessary CSV input file required for the simulation.
 
 **2. Run the Simulation**
 Execute `model/model_run.py` to run the model without the visualization interface. You can configure various parameters within the script, including:
@@ -35,7 +35,7 @@ Execute `model/model_run.py` to run the model without the visualization interfac
 **Expected Output:** The model generates a separate CSV file for each scenario and saves it to the `experiment` folder. These files log the average driving time for each replication, identified by their unique starting seeds.
 
 **3. Analyze the Results**
-Run the `notebooks/results_a3.ipynb` notebook to analyze the experimental data and generate the visualizations used in our final analysis.
+Run the `notebooks/2_visualization_results.ipynb` notebook to analyze the experimental data and generate the visualizations used in our final analysis.
 
 ---
 
