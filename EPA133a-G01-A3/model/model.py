@@ -232,7 +232,6 @@ class BangladeshModel(Model):
         if (source, sink) in self.path_ids_dict:
             return self.path_ids_dict[source, sink]
         else:
-            print(sink, source)
             shortest_path =  nx.shortest_path(self.G, source=source, target=sink, weight='weight')
             self.path_ids_dict[source, sink] = shortest_path
             return shortest_path
