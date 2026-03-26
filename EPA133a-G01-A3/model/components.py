@@ -306,7 +306,7 @@ class Vehicle(Agent):
     def get_next_id(self):
         if self.location_index + 1 >= len(self.path_ids):
             return None  # reached end
-        return self.path_ids.iloc[self.location_index + 1]
+        return self.path_ids[self.location_index + 1]
 
     def drive_to_next(self, distance):
         """
