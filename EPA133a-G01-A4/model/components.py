@@ -51,13 +51,14 @@ class Bridge(Infra):
     """
 
     def __init__(self, unique_id, model, length=0,
-                 name='Unknown', road_name='Unknown', condition='Unknown', water_dist=None, elevation=None, cyclone_intensity=None):
+                 name='Unknown', road_name='Unknown', condition='Unknown', water_dist=5, elevation=None, cyclone_intensity=None):
         super().__init__(unique_id, model, length, name, road_name)
 
         self.condition = condition
         # self.broken_chance = broken_chance
+        self.water_dist = water_dist
         self.vulnerability_score = self.calculate_vulnerabilityscore(water_dist, elevation, cyclone_intensity)
-        self.state = self.set_broken_bridge()
+        # self.state = self.set_broken_bridge()
         self.delay_time = self.set_delay_time()
 
 
