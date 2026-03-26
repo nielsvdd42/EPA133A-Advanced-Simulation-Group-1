@@ -77,14 +77,14 @@ class BangladeshModel(Model):
         self.G = nx.Graph()
         self.generate_model()
 
-        self.max_water = None
-        self.min_water = None
+        self.max_water = 0
+        self.min_water = 0
 
-        self.max_elev = None
-        self.min_elev = None
+        self.max_elev = 0
+        self.min_elev = 0
 
-        self.max_cycl = None
-        self.min_cycl = None
+        self.max_cycl = 0
+        self.min_cycl = 0
 
         self.datacollector = DataCollector(
             model_reporters={"Average_Driving_Time": compute_avg_driving_time}
