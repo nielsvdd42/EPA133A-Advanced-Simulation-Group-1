@@ -77,6 +77,15 @@ class BangladeshModel(Model):
         self.G = nx.Graph()
         self.generate_model()
 
+        self.max_water = None
+        self.min_water = None
+
+        self.max_elev = None
+        self.min_elev = None
+
+        self.max_cycl = None
+        self.min_cycl = None
+
         self.datacollector = DataCollector(
             model_reporters={"Average_Driving_Time": compute_avg_driving_time}
         )
@@ -156,7 +165,7 @@ class BangladeshModel(Model):
                     self.sinks.append(agent.unique_id)
                     network_nodes["sourcesinks"].append((row['id'], row['length'], row['lon'], row['lat']))
                 elif model_type == 'bridge':
-                    agent = Bridge(row['id'], self, row['length'], name, row['road'], condition=row['condition'], water_dist=row['distance'])
+                    agent = Bridge(row['id'], self, row['length'], name, row['road'], condition=row['condition'], water_dist=row['distance'], elevation=row['elev_1'], cyclone_intensity=row['WMO_WIND_I'])
                     network_nodes["bridges"].append((row['id'], row['length'],row['lon'], row['lat']))
                 elif model_type == 'link':
                     agent = Link(row['id'], self, row['length'], name, row['road'])
@@ -177,7 +186,19 @@ class BangladeshModel(Model):
         agents = self.schedule.agents
         bridges = [agent for agent in agents if agent.__class__ == Bridge]
         water_distances = [bridge.water_dist for bridge in bridges]
-        print(max(water_distances))
+        elevations = [bridge.elevation for bridge in bridges]
+        cyclone_intensities = [bridge.cyclone_intensity for bridge in bridges]
+        self.max_water = max(water_distances)
+        self.min_water = min(water_distances)
+
+        self.max_elev = max(elevations)
+        self.min_elev = min(elevations)
+
+        self.max_cycl = max(cyclone_intensities)
+        self.min_cycl = min(cyclone_intensities)
+
+        for bridge in bridges:
+            bridge.calculate_vulnerabilityscore()
 
     def generate_network(self, network_dict):
         """

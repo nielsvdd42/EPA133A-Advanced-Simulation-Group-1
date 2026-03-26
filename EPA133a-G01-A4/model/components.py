@@ -57,7 +57,7 @@ class Bridge(Infra):
         self.condition = condition
         # self.broken_chance = broken_chance
         self.water_dist = water_dist
-        self.vulnerability_score = self.calculate_vulnerabilityscore(water_dist, elevation, cyclone_intensity)
+        self.vulnerability_score = 0
         # self.state = self.set_broken_bridge()
         self.delay_time = self.set_delay_time()
 
@@ -107,17 +107,19 @@ class Bridge(Infra):
     def calculate_vulnerabilityscore(self, water_dist, elevation, cyclone_intensity):
         if water_dist is None or elevation is None or cyclone_intensity is None:
             return 0
-        water_max = 200
-        water_min = 0
+        water_max = self.model.max_water
+        water_min = self.model.min_water
         water_dist_score = (water_dist - water_min) / (water_max - water_min)
 
-        elevation_max = 150
-        elevation_min = -3
+        elevation_max = self.model.max_elev
+        elevation_min = self.model.min_elev
         elevation_score = (elevation - elevation_min) / (elevation_max - elevation_min)
 
-        cyclone_max = 2000
-        cyclone_min = 0
+        cyclone_max = self.model.max_cycl
+        cyclone_min = self.model.min_cycl
         cyclone_score = (cyclone_intensity - cyclone_min) / (cyclone_max - cyclone_min)
+
+        self.vulnerability_score = [water_dist_score, elevation_score, cyclone_score]
 
 
 # ---------------------------------------------------------------
