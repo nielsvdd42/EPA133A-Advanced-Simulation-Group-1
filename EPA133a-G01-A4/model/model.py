@@ -156,7 +156,7 @@ class BangladeshModel(Model):
                     self.sinks.append(agent.unique_id)
                     network_nodes["sourcesinks"].append((row['id'], row['length'], row['lon'], row['lat']))
                 elif model_type == 'bridge':
-                    agent = Bridge(row['id'], self, row['length'], name, row['road'], condition=row['condition'], broken_chance=self.scenario[row['condition']])
+                    agent = Bridge(row['id'], self, row['length'], name, row['road'], condition=row['condition'])
                     network_nodes["bridges"].append((row['id'], row['length'],row['lon'], row['lat']))
                 elif model_type == 'link':
                     agent = Link(row['id'], self, row['length'], name, row['road'])
