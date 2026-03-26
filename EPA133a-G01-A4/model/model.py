@@ -64,7 +64,7 @@ class BangladeshModel(Model):
 
     file_name = '../data/df_road_N1andN2_vulnerability_data.csv'
 
-    def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0, scenario={'A': 0.00, 'B': 0.00, 'C':0.00, 'D':0.00}):
+    def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0, scenario={'w_water': 1.00, 'w_elevation': 0.00, 'w_cyclone':0.00}):
 
         self.schedule = BaseScheduler(self)
         self.running = True
@@ -199,6 +199,7 @@ class BangladeshModel(Model):
 
         for bridge in bridges:
             bridge.calculate_vulnerabilityscore()
+            bridge.determine_brokenness(self.scenario)
 
     def generate_network(self, network_dict):
         """

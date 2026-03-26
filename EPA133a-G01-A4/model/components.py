@@ -124,6 +124,20 @@ class Bridge(Infra):
         self.vulnerability_score = [water_dist_score, elevation_score, cyclone_score]
         print(self.vulnerability_score)
 
+    def determine_brokenness(self, weights):
+        if sum(list(weights.values())) != 1:
+            print("Weights are wrong")
+            return 0
+        probability_broken = weights['w_water'] * self.vulnerability_score[0] + weights['w_elevation'] * self.vulnerability_score[1] + weights['w_cyclone'] * self.vulnerability_score[2]
+        if self.random.random() < probability_broken:
+            self.state = Bridge.State.BROKEN
+            print(f'Broken with probability {probability_broken}')
+            return probability_broken
+        else:
+            self.state = Bridge.State.HEALED
+            print(f'Healed with probability {probability_broken}')
+            return probability_broken
+
 
 # ---------------------------------------------------------------
 class Link(Infra):
