@@ -51,14 +51,14 @@ class Bridge(Infra):
     """
 
     def __init__(self, unique_id, model, length=0,
-                 name='Unknown', road_name='Unknown', condition='Unknown', broken_chance=0):
+                 name='Unknown', road_name='Unknown', condition='Unknown', water_dist=None, elevation=None, cyclone_intensity=None):
         super().__init__(unique_id, model, length, name, road_name)
 
         self.condition = condition
-        self.broken_chance = broken_chance
+        # self.broken_chance = broken_chance
         self.state = self.set_broken_bridge()
+        self.vulnerability_score = self.calculate_vulnerabilityscore(water_dist, elevation, cyclone_intensity)
         self.delay_time = self.set_delay_time()
-        # print(self.delay_time)
 
     class State(Enum):
         """
@@ -101,6 +101,21 @@ class Bridge(Infra):
                     return self.random.uniform(45, 90)
                 case n if n >= 200:
                     return self.random.triangular(60,240,120)
+
+    def calculate_vulnerabilityscore(self, water_dist, elevation, cyclone_intensity):
+        if water_dist is None or elevation is None or cyclone_intensity is None:
+            return 0
+        water_max = 200
+        water_min = 0
+        water_dist_score = (water_dist - water_min) / (water_max - water_min)
+
+        elevation_max = 150
+        elevation_min = -3
+        elevation_score = (elevation - elevation_min) / (elevation_max - elevation_min)
+
+        cyclone_max = 2000
+        cyclone_min = 0
+        cyclone_score = (cyclone_intensity - cyclone_min) / (cyclone_max - cyclone_min)
 
 
 # ---------------------------------------------------------------
