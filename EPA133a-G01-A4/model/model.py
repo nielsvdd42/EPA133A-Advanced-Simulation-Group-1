@@ -62,9 +62,9 @@ class BangladeshModel(Model):
 
     step_time = 1
 
-    file_name = '../data/df_road_N1andN2.csv'
+    file_name = '../data/df_road_N1andN2_vulnerability_data.csv'
 
-    def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0, scenario={'A': 0.00, 'B': 0.00, 'C':0.00, 'D':0.00}):
+    def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0, scenario={'w_water': 1.00, 'w_elevation': 0.00, 'w_cyclone':0.00}):
 
         self.schedule = BaseScheduler(self)
         self.running = True
@@ -76,6 +76,15 @@ class BangladeshModel(Model):
         self.completed_trip_times = []
         self.G = nx.Graph()
         self.generate_model()
+
+        self.max_water = 0
+        self.min_water = 0
+
+        self.max_elev = 0
+        self.min_elev = 0
+
+        self.max_cycl = 0
+        self.min_cycl = 0
 
         self.datacollector = DataCollector(
             model_reporters={"Average_Driving_Time": compute_avg_driving_time}
@@ -156,7 +165,7 @@ class BangladeshModel(Model):
                     self.sinks.append(agent.unique_id)
                     network_nodes["sourcesinks"].append((row['id'], row['length'], row['lon'], row['lat']))
                 elif model_type == 'bridge':
-                    agent = Bridge(row['id'], self, row['length'], name, row['road'], condition=row['condition'], broken_chance=self.scenario[row['condition']])
+                    agent = Bridge(row['id'], self, row['length'], name, row['road'], condition=row['condition'], water_dist=row['distance'], elevation=row['elev_1'], cyclone_intensity=row['WMO_WIND_I'])
                     network_nodes["bridges"].append((row['id'], row['length'],row['lon'], row['lat']))
                 elif model_type == 'link':
                     agent = Link(row['id'], self, row['length'], name, row['road'])
@@ -173,9 +182,24 @@ class BangladeshModel(Model):
                     self.space.place_agent(agent, (x, y))
                     agent.pos = (x, y)
         self.generate_network(network_nodes)
-        # pos = {}
-        # for node, data in self.G.nodes(data=True):
-        #     pos[node] = (data['lon'], data['lat'])
+
+        agents = self.schedule.agents
+        bridges = [agent for agent in agents if agent.__class__ == Bridge]
+        water_distances = [bridge.water_dist for bridge in bridges]
+        elevations = [bridge.elevation for bridge in bridges]
+        cyclone_intensities = [bridge.cyclone_intensity for bridge in bridges]
+        self.max_water = max(water_distances)
+        self.min_water = min(water_distances)
+
+        self.max_elev = max(elevations)
+        self.min_elev = min(elevations)
+
+        self.max_cycl = max(cyclone_intensities)
+        self.min_cycl = min(cyclone_intensities)
+
+        for bridge in bridges:
+            bridge.calculate_vulnerabilityscore()
+            bridge.determine_brokenness(self.scenario)
 
     def generate_network(self, network_dict):
         """

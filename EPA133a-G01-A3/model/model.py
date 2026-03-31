@@ -62,7 +62,7 @@ class BangladeshModel(Model):
 
     step_time = 1
 
-    file_name = '../data/data_intersectionsN1N2.csv'
+    file_name = '../data/df_road_N1andN2_vulnerability_data.csv'
 
     def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0, scenario={'A': 0.00, 'B': 0.00, 'C':0.00, 'D':0.00}):
 
@@ -156,7 +156,7 @@ class BangladeshModel(Model):
                     self.sinks.append(agent.unique_id)
                     network_nodes["sourcesinks"].append((row['id'], row['length'], row['lon'], row['lat']))
                 elif model_type == 'bridge':
-                    agent = Bridge(row['id'], self, row['length'], name, row['road'], condition=row['condition'], broken_chance=self.scenario[row['condition']])
+                    agent = Bridge(row['id'], self, row['length'], name, row['road'], condition=row['condition'], broken_chance=self.scenario[row['model_type']])
                     network_nodes["bridges"].append((row['id'], row['length'],row['lon'], row['lat']))
                 elif model_type == 'link':
                     agent = Link(row['id'], self, row['length'], name, row['road'])
@@ -173,6 +173,7 @@ class BangladeshModel(Model):
                     self.space.place_agent(agent, (x, y))
                     agent.pos = (x, y)
         self.generate_network(network_nodes)
+
         # pos = {}
         # for node, data in self.G.nodes(data=True):
         #     pos[node] = (data['lon'], data['lat'])

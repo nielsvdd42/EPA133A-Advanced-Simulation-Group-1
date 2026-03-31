@@ -58,7 +58,6 @@ class Bridge(Infra):
         self.broken_chance = broken_chance
         self.state = self.set_broken_bridge()
         self.delay_time = self.set_delay_time()
-        # print(self.delay_time)
 
     class State(Enum):
         """

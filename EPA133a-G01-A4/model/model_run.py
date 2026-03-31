@@ -27,11 +27,18 @@ run_length = 5 * 24 * 60
 
 simulations = 10
 #Scenarios
-scenarios = [{'A': 0.00, 'B': 0.00, 'C':0.00, 'D':0.00},
-             {'A': 0.00, 'B': 0.00, 'C':0.00, 'D':0.05},
-            {'A': 0.00, 'B': 0.00, 'C':0.05, 'D':0.10},
-             {'A': 0.00, 'B': 0.05, 'C':0.10, 'D':0.20},
-             {'A': 0.05, 'B': 0.10, 'C':0.20, 'D':0.40}]
+scenarios = [{'w_water': 0.3333, 'w_elevation': 0.3333, 'w_cyclone':0.3334},
+             {'w_water': 0.60, 'w_elevation': 0.20, 'w_cyclone':0.20},
+             {'w_water': 0.20, 'w_elevation': 0.60, 'w_cyclone':0.20},
+             {'w_water': 0.20, 'w_elevation': 0.20, 'w_cyclone':0.60},
+             {'w_water': 0.40, 'w_elevation': 0.15, 'w_cyclone':0.45},
+             {'w_water': 0.45, 'w_elevation': 0.40, 'w_cyclone':0.15},
+             {'w_water': 0.10, 'w_elevation': 0.45, 'w_cyclone':0.45},
+             {'w_water': 0.50, 'w_elevation': 0.30, 'w_cyclone':0.20},
+             {'w_water': 0.25, 'w_elevation': 0.15, 'w_cyclone':0.60},
+             {'w_water': 0.30, 'w_elevation': 0.50, 'w_cyclone':0.20},
+             {'w_water': 0.35, 'w_elevation': 0.10, 'w_cyclone':0.55},
+             {'w_water': 0.05, 'w_elevation': 0.05, 'w_cyclone':0.90}]
 
 scenario_i = 0
 for scenario in scenarios:
@@ -49,5 +56,5 @@ for scenario in scenarios:
         results_hihi.append(results_df.iloc[-1].Average_Driving_Time)
         seed = seed + 1
     scenario_result = pd.DataFrame(results_hihi, index=np.arange(12, 22, 1), columns=['Average Driving Time'])
-    scenario_result.to_csv(f"../experiment/average_driving_times_scenario{scenario_i}.csv", index_label='Seed')
+    scenario_result.to_csv(f"../experiment/results_scenario{scenario_i}.csv", index_label='Seed')
     scenario_i = scenario_i + 1

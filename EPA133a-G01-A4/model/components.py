@@ -51,14 +51,18 @@ class Bridge(Infra):
     """
 
     def __init__(self, unique_id, model, length=0,
-                 name='Unknown', road_name='Unknown', condition='Unknown', broken_chance=0):
+                 name='Unknown', road_name='Unknown', condition='Unknown', water_dist=5, elevation=None, cyclone_intensity=None):
         super().__init__(unique_id, model, length, name, road_name)
 
         self.condition = condition
-        self.broken_chance = broken_chance
-        self.state = self.set_broken_bridge()
+        # self.broken_chance = broken_chance
+        self.water_dist = water_dist
+        self.elevation = elevation
+        self.cyclone_intensity = cyclone_intensity
+        self.vulnerability_score = 0
+        # self.state = self.set_broken_bridge()
         self.delay_time = self.set_delay_time()
-        # print(self.delay_time)
+
 
     class State(Enum):
         """
@@ -101,6 +105,51 @@ class Bridge(Infra):
                     return self.random.uniform(45, 90)
                 case n if n >= 200:
                     return self.random.triangular(60,240,120)
+
+    def calculate_vulnerabilityscore(self):
+        if self.water_dist is None or self.elevation is None or self.cyclone_intensity is None:
+            return 0
+        water_max = self.model.max_water
+        water_min = self.model.min_water
+        water_dist_score = (self.water_dist - water_min) / (water_max - water_min)
+
+        elevation_max = self.model.max_elev
+        elevation_min = self.model.min_elev
+        elevation_score = (self.elevation - elevation_min) / (elevation_max - elevation_min)
+
+        cyclone_max = self.model.max_cycl
+        cyclone_min = self.model.min_cycl
+        cyclone_score = (self.cyclone_intensity - cyclone_min) / (cyclone_max - cyclone_min)
+
+        self.vulnerability_score = [water_dist_score, elevation_score, cyclone_score]
+        print(self.vulnerability_score)
+
+    def determine_brokenness(self, weights):
+        if sum(list(weights.values())) != 1:
+            print("Weights are wrong")
+            return 0
+        condition_score = -1
+        match self.condition:
+            case 'A':
+                condition_score = 0
+            case 'B':
+                condition_score = 0.15
+            case 'C':
+                condition_score = 0.30
+            case 'D':
+                condition_score = 0.55
+            case _:
+                raise Exception("Sorry, wrong bridge condition type")
+        geographic_score = weights['w_water'] * self.vulnerability_score[0] + weights['w_elevation'] * self.vulnerability_score[1] + weights['w_cyclone'] * self.vulnerability_score[2]
+        probability_broken = 0.5 * geographic_score + 0.5 * condition_score
+        if self.random.random() < probability_broken:
+            self.state = Bridge.State.BROKEN
+            print(f'Broken with probability {probability_broken}, with condition {condition_score} and {geographic_score}')
+            return probability_broken
+        else:
+            self.state = Bridge.State.HEALED
+            print(f'Healed with probability {probability_broken}, with condition {condition_score} and {geographic_score}')
+            return probability_broken
 
 
 # ---------------------------------------------------------------
