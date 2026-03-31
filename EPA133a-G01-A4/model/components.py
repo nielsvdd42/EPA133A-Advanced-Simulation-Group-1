@@ -128,14 +128,27 @@ class Bridge(Infra):
         if sum(list(weights.values())) != 1:
             print("Weights are wrong")
             return 0
-        probability_broken = weights['w_water'] * self.vulnerability_score[0] + weights['w_elevation'] * self.vulnerability_score[1] + weights['w_cyclone'] * self.vulnerability_score[2]
+        condition_score = -1
+        match self.condition:
+            case 'A':
+                condition_score = 0
+            case 'B':
+                condition_score = 0.15
+            case 'C':
+                condition_score = 0.30
+            case 'D':
+                condition_score = 0.55
+            case _:
+                raise Exception("Sorry, wrong bridge condition type")
+        geographic_score = weights['w_water'] * self.vulnerability_score[0] + weights['w_elevation'] * self.vulnerability_score[1] + weights['w_cyclone'] * self.vulnerability_score[2]
+        probability_broken = 0.5 * geographic_score + 0.5 * condition_score
         if self.random.random() < probability_broken:
             self.state = Bridge.State.BROKEN
-            print(f'Broken with probability {probability_broken}')
+            print(f'Broken with probability {probability_broken}, with condition {condition_score} and {geographic_score}')
             return probability_broken
         else:
             self.state = Bridge.State.HEALED
-            print(f'Healed with probability {probability_broken}')
+            print(f'Healed with probability {probability_broken}, with condition {condition_score} and {geographic_score}')
             return probability_broken
 
 
