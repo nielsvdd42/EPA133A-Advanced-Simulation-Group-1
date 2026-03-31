@@ -2,8 +2,6 @@ from mesa import Model
 from mesa.time import BaseScheduler
 from mesa.space import ContinuousSpace
 from mesa.datacollection import DataCollector
-from networkx.algorithms.components import is_connected
-
 from components import Source, Sink, SourceSink, Bridge, Link, Intersection
 import pandas as pd
 from collections import defaultdict
@@ -64,7 +62,7 @@ class BangladeshModel(Model):
 
     step_time = 1
 
-    file_name = '../data/data_intersectionsN1N2.csv'
+    file_name = '../data/df_road_N1andN2.csv'
 
     def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0, scenario={'A': 0.00, 'B': 0.00, 'C':0.00, 'D':0.00}):
 
@@ -206,8 +204,6 @@ class BangladeshModel(Model):
                 if path.iloc[i] in links:
                     edge_list.append((path.iloc[i-1], path.iloc[i+1], links[path.iloc[i]]))
         self.G.add_weighted_edges_from(edge_list)
-        print(is_connected(self.G))
-        print("UUUUUUUUU")
 
 
     def get_random_route(self, source):
