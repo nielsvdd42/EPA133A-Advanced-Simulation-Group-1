@@ -62,7 +62,7 @@ class BangladeshModel(Model):
 
     step_time = 1
 
-    file_name = '../data/df_road_N1andN2_vulnerability_data.csv'
+    file_name = '../data/data_final_with_aadt_and_vulnerability.csv'
 
     def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0, scenario={'w_water': 1.00, 'w_elevation': 0.00, 'w_cyclone':0.00}):
 
@@ -165,7 +165,7 @@ class BangladeshModel(Model):
                     self.sinks.append(agent.unique_id)
                     network_nodes["sourcesinks"].append((row['id'], row['length'], row['lon'], row['lat']))
                 elif model_type == 'bridge':
-                    agent = Bridge(row['id'], self, row['length'], name, row['road'], condition=row['condition'], water_dist=row['distance'], elevation=row['elev_1'], cyclone_intensity=row['WMO_WIND_I'])
+                    agent = Bridge(row['id'], self, row['length'], name, row['road'], condition=row['condition'], water_dist=row['distance'], elevation=row['elevation'], cyclone_intensity=row['WMO_WIND_I'])
                     network_nodes["bridges"].append((row['id'], row['length'],row['lon'], row['lat']))
                 elif model_type == 'link':
                     agent = Link(row['id'], self, row['length'], name, row['road'])
