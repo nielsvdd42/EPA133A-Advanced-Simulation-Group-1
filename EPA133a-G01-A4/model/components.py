@@ -62,6 +62,7 @@ class Bridge(Infra):
         self.vulnerability_score = 0
         # self.state = self.set_broken_bridge()
         self.delay_time = self.set_delay_time()
+        self.total_delay = 0
 
 
     class State(Enum):
@@ -73,6 +74,7 @@ class Bridge(Infra):
 
     def get_delay_time(self):
         self.delay_time = self.set_delay_time()
+        self.total_delay += self.delay_time
         return self.delay_time
 
     def set_broken_bridge(self):
@@ -382,6 +384,8 @@ class Vehicle(Agent):
         elif isinstance(next_infra, Bridge):
             if next_infra.state == Bridge.State.BROKEN:
                 self.waiting_time = next_infra.get_delay_time()
+                print(f"Delay time assigned: {self.waiting_time}")
+                print(f"Bridge total_delay: {next_infra.total_delay}")
             if self.waiting_time > 0:
                 # arrive at the bridge and wait
                 self.arrive_at_next(next_infra, 0)

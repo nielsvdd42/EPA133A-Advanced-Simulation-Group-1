@@ -64,7 +64,7 @@ class BangladeshModel(Model):
 
     file_name = '../data/data_final_with_aadt_and_vulnerability.csv'
 
-    def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0, scenario={'w_water': 1.00, 'w_elevation': 0.00, 'w_cyclone':0.00}):
+    def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0, scenario={'w_water': 1.00, 'w_elevation': 0.00, 'w_cyclone':1.00}):
 
         self.schedule = BaseScheduler(self)
         self.running = True
@@ -87,7 +87,9 @@ class BangladeshModel(Model):
         self.min_cycl = 0
 
         self.datacollector = DataCollector(
-            model_reporters={"Average_Driving_Time": compute_avg_driving_time}
+            model_reporters={"Average_Driving_Time": compute_avg_driving_time},
+            agent_reporters = {"Total_Delay": lambda a: a.total_delay if isinstance(a, Bridge) else 0}
+
         )
 
     def generate_model(self):
@@ -269,6 +271,12 @@ class BangladeshModel(Model):
         Advance the simulation by one step.
         """
         self.schedule.step()
+
+        # DEBUG: force evaluation AFTER all updates
+        for a in self.schedule.agents:
+            if isinstance(a, Bridge):
+                _ = a.total_delay  # force access
+
         self.datacollector.collect(self)
 
 

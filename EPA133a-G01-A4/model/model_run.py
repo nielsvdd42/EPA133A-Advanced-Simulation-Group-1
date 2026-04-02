@@ -9,10 +9,9 @@ import numpy as np
 # ---------------------------------------------------------------
 
 # run time 5 x 24 hours; 1 tick 1 minute
-run_length = 5 * 24 * 60
-
+#run_length = 5 * 24 * 60
 # run time 1000 ticks
-# run_length = 1000
+run_length = 1000
 
 # seed = 1234567
 #
@@ -57,4 +56,12 @@ for scenario in scenarios:
         seed = seed + 1
     scenario_result = pd.DataFrame(results_hihi, index=np.arange(12, 22, 1), columns=['Average Driving Time'])
     scenario_result.to_csv(f"../experiment/results_scenario{scenario_i}.csv", index_label='Seed')
+    agent_data = sim_model.datacollector.get_agent_vars_dataframe()
+    bridge_delays = (
+        agent_data["Total_Delay"]
+        .dropna()
+        .groupby("AgentID")
+        .max())
+    scenario_result_delays = pd.DataFrame(bridge_delays[bridge_delays > 0])
+    scenario_result_delays.to_csv(f"../experiment/final_delays_scenario{scenario_i}.csv", index_label='BridgeID')
     scenario_i = scenario_i + 1
