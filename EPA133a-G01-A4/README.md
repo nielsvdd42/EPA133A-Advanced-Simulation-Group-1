@@ -23,7 +23,15 @@ Because bridges play a crucial role in Bangladesh's transport network and are vu
 ## How to Use
 
 **1. Prepare the Data**
-Run notebooks 1&2 in ascending order to prepare the necessary dataset. Executing these notebook generates the necessary CSV input file required for the simulation.
+Run `notebook/1_read_traffic_data.ipynb` and `notebook/2_data_preparation_with_AADT.ipynb` in sequential order to prepare the necessary dataset. Executing these notebook generates the necessary CSV input file required for the agent-based model.
+
+**1a Include vulnerability data**
+Then to add the geographical data to the csv, the software tool Qgis was used to add columns on elevation, distance to water bodies and historical cyclone data.
+The Qgis project including its layer data and model is included in the `qgis` folder. Unzip the folder and connect to the geopackage in Qgis.
+Open the 'Bridge vulnerability' project and open the Processing Toolbox. Go to 'Project models' and execute the 'Qgis vulnerability data' model.
+The model asks for input layers, which are the provided layers for the AADT input csv, cyclone data, digital elevation model and waterways.
+After running the model, the final_processed_layer can be manually exported to a .csv file.
+
 
 **2. Run the Simulation**
 Execute `model/model_run.py` to run the model without the visualization interface. You can configure various parameters within the script, including:

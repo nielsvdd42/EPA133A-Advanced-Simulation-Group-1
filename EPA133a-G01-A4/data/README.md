@@ -26,16 +26,22 @@ The simple transport model demo, see [../model/model.py](../model/model.py) for 
 
 ## Format
 
-|     Column | Description                                              |
-| ---------: | :------------------------------------------------------- |
-|       road | On which road does the component belong to               |
-|         id | **Unique ID** of the component                           |
-| model_type | Type (i.e. class) of the model component to be generated |
- | condition| Condition of the object, determines the change of breaking down|
-|       name | Name of the object                                       |
-|        lat | Latitude in Decimal Degrees                              |
-|        lon | Longitude in Decimal Degrees                             |
-|     length | Length of the object in meters                           |
+|         Column | Description                                                                         |
+|---------------:|:------------------------------------------------------------------------------------|
+|           road | On which road does the component belong to                                          |
+|             id | **Unique ID** of the component                                                      |
+|     model_type | Type (i.e. class) of the model component to be generated                            |
+ |      condition | Condition of the object, determines the change of breaking down                     |
+|           name | Name of the object                                                                  |
+|            lat | Latitude in Decimal Degrees                                                         |
+|            lon | Longitude in Decimal Degrees                                                        |
+|         length | Length of the object in meters                                                      |
+| avg_truck_AADT | Total volume of vehicle traffic divided by 365 days per year                        |
+|     WMO_WIND_I | Sum of maximum wind speeds of cyclone date in 50km proximity in kilometers per hour |
+|       distance | Distance to nearest water body in meters                                            |
+|      elevation | Elevation level in meters                                                           |
+
+
 
 The column `road` is used by the model generation to classify model components by roads, i.e., on which road does a component belong to. The model generation assumes that the infrastructure model components of the same road is ordered sequentially. This means, e.g. in `demo-4.csv`, component `1000000` is connected to component `1000001`, that is connected to component `1000002`, that is connected to component `1000003`, etc., all of which are on road `N1`. Similarity, component `1000013` is connected to component `1000014`, that is connected to component `1000015`, etc., all of which are on road `N2`. Each model component has a unique id according to which the Mesa model is generated. Note that the same `intersection` component that connect different roads would have the same id.
 
