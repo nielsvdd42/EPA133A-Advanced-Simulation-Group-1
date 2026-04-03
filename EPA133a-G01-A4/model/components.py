@@ -55,13 +55,11 @@ class Bridge(Infra):
         super().__init__(unique_id, model, length, name, road_name)
 
         self.condition = condition
-        # self.broken_chance = broken_chance
         self.water_dist = water_dist
         self.elevation = elevation
         self.cyclone_intensity = cyclone_intensity
         self.vulnerability_score = 0
         self.state = Bridge.State.HEALED
-        self.delay_time = self.set_delay_time()
         self.total_delay = 0
 
 
@@ -72,41 +70,27 @@ class Bridge(Infra):
         HEALED = 1
         BROKEN = 2
 
+
     def get_delay_time(self):
-        self.delay_time = self.set_delay_time()
-        self.total_delay += self.delay_time
-        return self.delay_time
-
-    def set_broken_bridge(self):
-        """
-        Called while initializing bridges, determining whether a bridge is broken or not
-        """
-        if self.random.random() < self.broken_chance:
-            print('Bridge is **** broken')
-            return Bridge.State.BROKEN
-
-        else:
-            print('Bridge is whole :)')
-            return Bridge.State.HEALED
-
-
-    def set_delay_time(self):
         """
         Calculates the delay time based on random draws from the distributions
         specified in the assignment
         """
+        delay_time = 0
         if self.State == Bridge.State.HEALED:
-            return 0
+            return delay_time
         else:
             match self.length:
                 case n if n < 10:
-                    return self.random.uniform(10,20)
+                    delay_time = self.random.uniform(10,20)
                 case n if n < 50:
-                    return self.random.uniform(15,60)
+                    delay_time = self.random.uniform(15,60)
                 case n if n < 200:
-                    return self.random.uniform(45, 90)
+                    delay_time = self.random.uniform(45, 90)
                 case n if n >= 200:
-                    return self.random.triangular(60,240,120)
+                    delay_time = self.random.triangular(60,240,120)
+            self.total_delay += delay_time
+            return delay_time
 
     def calculate_vulnerabilityscore(self):
         if self.water_dist is None or self.elevation is None or self.cyclone_intensity is None:
