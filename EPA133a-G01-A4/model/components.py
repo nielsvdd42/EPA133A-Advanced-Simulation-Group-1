@@ -60,7 +60,7 @@ class Bridge(Infra):
         self.elevation = elevation
         self.cyclone_intensity = cyclone_intensity
         self.vulnerability_score = 0
-        # self.state = self.set_broken_bridge()
+        self.state = Bridge.State.HEALED
         self.delay_time = self.set_delay_time()
         self.total_delay = 0
 
@@ -384,10 +384,10 @@ class Vehicle(Agent):
             self.location.remove(self)
             return
         elif isinstance(next_infra, Bridge):
-            if next_infra.State == Bridge.State.BROKEN:
+            if next_infra.state == Bridge.State.BROKEN:
                 self.waiting_time = next_infra.get_delay_time()
-                #print(f"Delay time assigned: {self.waiting_time}")
-                #print(f"Bridge total_delay: {next_infra.total_delay}")
+                print(f"Delay time assigned: {self.waiting_time}")
+                print(f"Bridge total_delay: {next_infra.total_delay}")
             if self.waiting_time > 0:
                 # arrive at the bridge and wait
                 self.arrive_at_next(next_infra, 0)

@@ -64,7 +64,7 @@ class BangladeshModel(Model):
 
     file_name = '../data/data_final_with_aadt_and_vulnerability.csv'
 
-    def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0, scenario={'w_water': 1.00, 'w_elevation': 0.00, 'w_cyclone':1.00}):
+    def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0, scenario={'w_water': 1.00, 'w_elevation': 0.00, 'w_cyclone':0.00}):
 
         self.sink_weights = None
         self.schedule = BaseScheduler(self)
@@ -77,9 +77,6 @@ class BangladeshModel(Model):
         self.completed_trip_times = []
         self.G = nx.Graph()
         self.generate_model()
-
-        self.source_weights = [self.aadt_dict[s] for s in self.sources]
-        self.sink_weights = [self.aadt_dict[s] for s in self.sinks]
 
         self.max_water = 0
         self.min_water = 0
@@ -170,9 +167,6 @@ class BangladeshModel(Model):
                     self.sources.append(agent.unique_id)
                     self.sinks.append(agent.unique_id)
                     network_nodes["sourcesinks"].append((row['id'], row['length'], row['lon'], row['lat']))
-
-                    self.aadt_dict[row['id']] = row['avg_truck_AADT']
-
                 elif model_type == 'bridge':
                     agent = Bridge(row['id'], self, row['length'], name, row['road'], condition=row['condition'], water_dist=row['distance'], elevation=row['elevation'], cyclone_intensity=row['WMO_WIND_I'])
                     network_nodes["bridges"].append((row['id'], row['length'],row['lon'], row['lat']))
@@ -249,14 +243,19 @@ class BangladeshModel(Model):
         """
         pick up a random route given an origin
         """
-        if source is None:
-            source = self.random.choices(self.sources, weights=self.source_weights, k=1)[0]
         while True:
-            # different source and sink
             sink = self.random.choice(self.sinks)
             if sink is not source:
                 break
         return self.path_ids_dict[source, sink]
+        # if source is None:
+        #     source = self.random.choices(self.sources, weights=self.source_weights, k=1)[0]
+        # while True:
+        #     # different source and sink
+        #     sink = self.random.choice(self.sinks)
+        #     if sink is not source:
+        #         break
+        # return self.path_ids_dict[source, sink]
 
     def get_route(self, source):
         """
