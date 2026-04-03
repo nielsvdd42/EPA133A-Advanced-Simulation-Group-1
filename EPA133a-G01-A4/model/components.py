@@ -384,7 +384,7 @@ class Vehicle(Agent):
             self.location.remove(self)
             return
         elif isinstance(next_infra, Bridge):
-            if next_infra.state == Bridge.State.BROKEN:
+            if next_infra.State == Bridge.State.BROKEN:
                 self.waiting_time = next_infra.get_delay_time()
                 #print(f"Delay time assigned: {self.waiting_time}")
                 #print(f"Bridge total_delay: {next_infra.total_delay}")

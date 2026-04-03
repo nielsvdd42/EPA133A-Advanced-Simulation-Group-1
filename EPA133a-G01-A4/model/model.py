@@ -78,6 +78,9 @@ class BangladeshModel(Model):
         self.G = nx.Graph()
         self.generate_model()
 
+        self.source_weights = [self.aadt_dict[s] for s in self.sources]
+        self.sink_weights = [self.aadt_dict[s] for s in self.sinks]
+
         self.max_water = 0
         self.min_water = 0
 
@@ -167,6 +170,9 @@ class BangladeshModel(Model):
                     self.sources.append(agent.unique_id)
                     self.sinks.append(agent.unique_id)
                     network_nodes["sourcesinks"].append((row['id'], row['length'], row['lon'], row['lat']))
+
+                    self.aadt_dict[row['id']] = row['avg_truck_AADT']
+
                 elif model_type == 'bridge':
                     agent = Bridge(row['id'], self, row['length'], name, row['road'], condition=row['condition'], water_dist=row['distance'], elevation=row['elevation'], cyclone_intensity=row['WMO_WIND_I'])
                     network_nodes["bridges"].append((row['id'], row['length'],row['lon'], row['lat']))
@@ -243,6 +249,8 @@ class BangladeshModel(Model):
         """
         pick up a random route given an origin
         """
+        if source is None:
+            source = self.random.choices(self.sources, weights=self.source_weights, k=1)[0]
         while True:
             # different source and sink
             sink = self.random.choice(self.sinks)
