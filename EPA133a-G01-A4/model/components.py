@@ -93,6 +93,9 @@ class Bridge(Infra):
             return delay_time
 
     def calculate_vulnerabilityscore(self):
+        """
+        Calculates the vulnerability score of a bridge and sets it
+        """
         if self.water_dist is None or self.elevation is None or self.cyclone_intensity is None:
             return 0
         water_max = self.model.max_water
@@ -113,6 +116,9 @@ class Bridge(Infra):
         #print(self.vulnerability_score)
 
     def determine_brokenness(self, weights):
+        """
+        Calculates whether a bridge is broken or not based on a scenario and individual scores
+        """
         if sum(list(weights.values())) != 1:
             print("Weights are wrong")
             return 0

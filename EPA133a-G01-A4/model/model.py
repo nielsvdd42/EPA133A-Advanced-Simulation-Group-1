@@ -191,6 +191,7 @@ class BangladeshModel(Model):
         water_distances = [bridge.water_dist for bridge in bridges]
         elevations = [bridge.elevation for bridge in bridges]
         cyclone_intensities = [bridge.cyclone_intensity for bridge in bridges]
+
         self.max_water = max(water_distances)
         self.min_water = min(water_distances)
 
@@ -259,7 +260,7 @@ class BangladeshModel(Model):
 
     def get_route(self, source):
         """
-        Picks a random sink and generates the shortest path from the specified source to this sink.
+        Picks a random sink relative to  and generates the shortest path from the specified source to this sink.
         First looks up if a path has been generated before, otherwise generates new one from networkX model.
         """
         candidate_sinks = [s for s in self.sinks if s != source]

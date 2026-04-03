@@ -12,18 +12,18 @@ Created by: EPA133a Group 01
 
 
 ## Overview
-This repository contains the model, data, and experimental setup for Assignment 3 of the EPA133a Advanced Simulation course. 
-The project focuses on building a data-driven, agent-based simulation using the Mesa framework (version 2.1.4) in Python.
+This repository contains the model, data, and experimental setup for Assignment 4 of the EPA133a Advanced Simulation course. 
+The project focuses on assessing the criticality of bridges using the Mesa framework (version 2.1.4) in Python.
 
 ### Project Objective
-The primary goal of this simulation is to automatically generate a model to study the effects of bridge maintenance and unavailability on traffic throughput in Bangladesh. 
+The primary goal of this simulation is to automatically generate a model to study the effects of natural disasters and unavailability of bridges on traffic throughput in Bangladesh. 
 Specifically, the model simulates goods transport (trucks) along the economically vital N1&N2 highways and all its large sideroads. 
-Because bridges play a crucial role in Bangladesh's transport network and are vulnerable to disruptions, this model analyzes how varying bridge qualities (Categories A, B, C, and D) impact overall travel delays in the road network.
+Because bridges play a crucial role in Bangladesh's transport network and are vulnerable to disruptions, this model analyzes how varying bridge qualities (Categories A, B, C, and D) and natural disaster risk-factors impact overall travel delays in the road network.
 
 ## How to Use
 
 **1. Prepare the Data**
-Run the `notebooks/1_data_preparation.ipynb` notebook to prepare the Bangladesh bridges dataset. Executing this notebook generates the necessary CSV input file required for the simulation.
+Run notebooks 1&2 in ascending order to prepare the necessary dataset. Executing these notebook generates the necessary CSV input file required for the simulation.
 
 **2. Run the Simulation**
 Execute `model/model_run.py` to run the model without the visualization interface. You can configure various parameters within the script, including:
@@ -35,7 +35,7 @@ Execute `model/model_run.py` to run the model without the visualization interfac
 **Expected Output:** The model generates a separate CSV file for each scenario and saves it to the `experiment` folder. These files log the average driving time for each replication, identified by their unique starting seeds.
 
 **3. Analyze the Results**
-Run the `notebooks/2_visualization_results.ipynb` notebook to analyze the experimental data and generate the visualizations used in our final analysis.
+Run the notebooks 3a, 3b, 3c to analyze the experimental data and generate the visualizations used in our final analysis.
 
 ---
 
