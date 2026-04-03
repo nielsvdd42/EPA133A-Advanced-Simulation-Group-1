@@ -126,7 +126,7 @@ class Bridge(Infra):
         cyclone_score = (self.cyclone_intensity - cyclone_min) / (cyclone_max - cyclone_min)
 
         self.vulnerability_score = [water_dist_score, elevation_score, cyclone_score]
-        print(self.vulnerability_score)
+        #print(self.vulnerability_score)
 
     def determine_brokenness(self, weights):
         if sum(list(weights.values())) != 1:
@@ -148,11 +148,11 @@ class Bridge(Infra):
         probability_broken = 0.5 * geographic_score + 0.5 * condition_score
         if self.random.random() < probability_broken:
             self.state = Bridge.State.BROKEN
-            print(f'Broken with probability {probability_broken}, with condition {condition_score} and {geographic_score}')
+            #print(f'Broken with probability {probability_broken}, with condition {condition_score} and {geographic_score}')
             return probability_broken
         else:
             self.state = Bridge.State.HEALED
-            print(f'Healed with probability {probability_broken}, with condition {condition_score} and {geographic_score}')
+            #print(f'Healed with probability {probability_broken}, with condition {condition_score} and {geographic_score}')
             return probability_broken
 
 
@@ -386,8 +386,8 @@ class Vehicle(Agent):
         elif isinstance(next_infra, Bridge):
             if next_infra.state == Bridge.State.BROKEN:
                 self.waiting_time = next_infra.get_delay_time()
-                print(f"Delay time assigned: {self.waiting_time}")
-                print(f"Bridge total_delay: {next_infra.total_delay}")
+                #print(f"Delay time assigned: {self.waiting_time}")
+                #print(f"Bridge total_delay: {next_infra.total_delay}")
             if self.waiting_time > 0:
                 # arrive at the bridge and wait
                 self.arrive_at_next(next_infra, 0)

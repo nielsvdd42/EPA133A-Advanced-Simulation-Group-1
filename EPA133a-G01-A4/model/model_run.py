@@ -9,9 +9,9 @@ import numpy as np
 # ---------------------------------------------------------------
 
 # run time 5 x 24 hours; 1 tick 1 minute
-#run_length = 5 * 24 * 60
+run_length = 3 * 24 * 60
 # run time 1000 ticks
-run_length = 1000
+#run_length = 1000
 
 # seed = 1234567
 #
@@ -27,16 +27,16 @@ run_length = 1000
 simulations = 10
 #Scenarios
 scenarios = [{'w_water': 0.3333, 'w_elevation': 0.3333, 'w_cyclone':0.3334},
-             # {'w_water': 0.60, 'w_elevation': 0.20, 'w_cyclone':0.20},
-             # {'w_water': 0.20, 'w_elevation': 0.60, 'w_cyclone':0.20},
-             # {'w_water': 0.20, 'w_elevation': 0.20, 'w_cyclone':0.60},
-             # {'w_water': 0.40, 'w_elevation': 0.15, 'w_cyclone':0.45},
-             # {'w_water': 0.45, 'w_elevation': 0.40, 'w_cyclone':0.15},
-             # {'w_water': 0.10, 'w_elevation': 0.45, 'w_cyclone':0.45},
-             # {'w_water': 0.50, 'w_elevation': 0.30, 'w_cyclone':0.20},
-             # {'w_water': 0.25, 'w_elevation': 0.15, 'w_cyclone':0.60},
-             # {'w_water': 0.30, 'w_elevation': 0.50, 'w_cyclone':0.20},
-             # {'w_water': 0.35, 'w_elevation': 0.10, 'w_cyclone':0.55},
+             {'w_water': 0.60, 'w_elevation': 0.20, 'w_cyclone':0.20},
+             {'w_water': 0.20, 'w_elevation': 0.60, 'w_cyclone':0.20},
+             {'w_water': 0.20, 'w_elevation': 0.20, 'w_cyclone':0.60},
+             {'w_water': 0.40, 'w_elevation': 0.15, 'w_cyclone':0.45},
+             {'w_water': 0.45, 'w_elevation': 0.40, 'w_cyclone':0.15},
+             {'w_water': 0.10, 'w_elevation': 0.45, 'w_cyclone':0.45},
+             {'w_water': 0.50, 'w_elevation': 0.30, 'w_cyclone':0.20},
+             {'w_water': 0.25, 'w_elevation': 0.15, 'w_cyclone':0.60},
+             {'w_water': 0.30, 'w_elevation': 0.50, 'w_cyclone':0.20},
+             {'w_water': 0.35, 'w_elevation': 0.10, 'w_cyclone':0.55},
              {'w_water': 0.05, 'w_elevation': 0.05, 'w_cyclone':0.90}]
 
 scenario_i = 0
