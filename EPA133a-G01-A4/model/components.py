@@ -113,11 +113,13 @@ class Bridge(Infra):
             return 0
         water_max = self.model.max_water
         water_min = self.model.min_water
-        water_dist_score = (self.water_dist - water_min) / (water_max - water_min)
+        water_dist = (self.water_dist - water_min) / (water_max - water_min)
+        water_dist_score = 1 - water_dist
 
         elevation_max = self.model.max_elev
         elevation_min = self.model.min_elev
-        elevation_score = (self.elevation - elevation_min) / (elevation_max - elevation_min)
+        elevation = (self.elevation - elevation_min) / (elevation_max - elevation_min)
+        elevation_score = 1 - elevation
 
         cyclone_max = self.model.max_cycl
         cyclone_min = self.model.min_cycl
@@ -181,7 +183,7 @@ class Sink(Infra):
     def remove(self, vehicle):
         self.model.schedule.remove(vehicle)
         self.vehicle_removed_toggle = not self.vehicle_removed_toggle
-        print(str(self) + ' REMOVE ' + str(vehicle))
+        #print(str(self) + ' REMOVE ' + str(vehicle))
 
 
 # ---------------------------------------------------------------
@@ -228,7 +230,7 @@ class Source(Infra):
                 Source.truck_counter += 1
                 self.vehicle_count += 1
                 self.vehicle_generated_flag = True
-                print(str(self) + " GENERATE " + str(agent))
+                #print(str(self) + " GENERATE " + str(agent))
         except Exception as e:
             print("Oops!", e.__class__, "occurred.")
 
