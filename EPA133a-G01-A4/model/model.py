@@ -64,9 +64,9 @@ class BangladeshModel(Model):
 
     file_name = '../data/data_final_with_aadt_and_vulnerability.csv'
 
-    def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0, scenario={'w_water': 1.00, 'w_elevation': 0.00, 'w_cyclone':1.00}):
+    def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0, scenario={'w_water': 1.00, 'w_elevation': 0.00, 'w_cyclone':0.00}):
 
-        self.aadt_dict = {}
+        self.sink_weights = None
         self.schedule = BaseScheduler(self)
         self.running = True
         self.path_ids_dict = defaultdict(lambda: pd.Series())
@@ -77,9 +77,6 @@ class BangladeshModel(Model):
         self.completed_trip_times = []
         self.G = nx.Graph()
         self.generate_model()
-
-        self.source_weights = [self.aadt_dict[s] for s in self.sources]
-        self.sink_weights = [self.aadt_dict[s] for s in self.sinks]
 
         self.max_water = 0
         self.min_water = 0
@@ -170,9 +167,6 @@ class BangladeshModel(Model):
                     self.sources.append(agent.unique_id)
                     self.sinks.append(agent.unique_id)
                     network_nodes["sourcesinks"].append((row['id'], row['length'], row['lon'], row['lat']))
-
-                    self.aadt_dict[row['id']] = row['avg_truck_AADT']
-
                 elif model_type == 'bridge':
                     agent = Bridge(row['id'], self, row['length'], name, row['road'], condition=row['condition'], water_dist=row['distance'], elevation=row['elevation'], cyclone_intensity=row['WMO_WIND_I'])
                     network_nodes["bridges"].append((row['id'], row['length'],row['lon'], row['lat']))
@@ -191,7 +185,7 @@ class BangladeshModel(Model):
                     self.space.place_agent(agent, (x, y))
                     agent.pos = (x, y)
         self.generate_network(network_nodes)
-
+        
         agents = self.schedule.agents
         bridges = [agent for agent in agents if agent.__class__ == Bridge]
         water_distances = [bridge.water_dist for bridge in bridges]
@@ -209,6 +203,12 @@ class BangladeshModel(Model):
         for bridge in bridges:
             bridge.calculate_vulnerabilityscore()
             bridge.determine_brokenness(self.scenario)
+
+        self.sink_weights = {}
+        for df in df_objects_all:
+            for _, row in df.iterrows():
+                if row['model_type'].strip() == 'sourcesink':
+                    self.sink_weights[row['id']] = row['avg_truck_AADT']
 
     def generate_network(self, network_dict):
         """
@@ -243,25 +243,29 @@ class BangladeshModel(Model):
         """
         pick up a random route given an origin
         """
-        if source is None:
-            source = self.random.choices(self.sources, weights=self.source_weights, k=1)[0]
         while True:
-            # different source and sink
             sink = self.random.choice(self.sinks)
             if sink is not source:
                 break
         return self.path_ids_dict[source, sink]
+        # if source is None:
+        #     source = self.random.choices(self.sources, weights=self.source_weights, k=1)[0]
+        # while True:
+        #     # different source and sink
+        #     sink = self.random.choice(self.sinks)
+        #     if sink is not source:
+        #         break
+        # return self.path_ids_dict[source, sink]
 
     def get_route(self, source):
         """
         Picks a random sink and generates the shortest path from the specified source to this sink.
         First looks up if a path has been generated before, otherwise generates new one from networkX model.
         """
-        while True:
-            # different source and sink
-            sink = self.random.choices(self.sinks, weights=self.sink_weights, k=1)[0]
-            if sink is not source:
-                break
+        candidate_sinks = [s for s in self.sinks if s != source]
+        weights = [self.sink_weights.get(s, 1) for s in candidate_sinks]  # fallback weight = 1
+
+        sink = self.random.choices(candidate_sinks, weights=weights, k=1)[0]
         if (source, sink) in self.path_ids_dict:
             return self.path_ids_dict[source, sink]
         else:

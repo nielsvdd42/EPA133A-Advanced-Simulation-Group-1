@@ -60,7 +60,7 @@ class Bridge(Infra):
         self.elevation = elevation
         self.cyclone_intensity = cyclone_intensity
         self.vulnerability_score = 0
-        # self.state = self.set_broken_bridge()
+        self.state = Bridge.State.HEALED
         self.delay_time = self.set_delay_time()
         self.total_delay = 0
 
@@ -113,18 +113,20 @@ class Bridge(Infra):
             return 0
         water_max = self.model.max_water
         water_min = self.model.min_water
-        water_dist_score = (self.water_dist - water_min) / (water_max - water_min)
+        water_dist = (self.water_dist - water_min) / (water_max - water_min)
+        water_dist_score = 1 - water_dist
 
         elevation_max = self.model.max_elev
         elevation_min = self.model.min_elev
-        elevation_score = (self.elevation - elevation_min) / (elevation_max - elevation_min)
+        elevation = (self.elevation - elevation_min) / (elevation_max - elevation_min)
+        elevation_score = 1 - elevation
 
         cyclone_max = self.model.max_cycl
         cyclone_min = self.model.min_cycl
         cyclone_score = (self.cyclone_intensity - cyclone_min) / (cyclone_max - cyclone_min)
 
         self.vulnerability_score = [water_dist_score, elevation_score, cyclone_score]
-        print(self.vulnerability_score)
+        #print(self.vulnerability_score)
 
     def determine_brokenness(self, weights):
         if sum(list(weights.values())) != 1:
@@ -146,11 +148,11 @@ class Bridge(Infra):
         probability_broken = 0.5 * geographic_score + 0.5 * condition_score
         if self.random.random() < probability_broken:
             self.state = Bridge.State.BROKEN
-            print(f'Broken with probability {probability_broken}, with condition {condition_score} and {geographic_score}')
+            #print(f'Broken with probability {probability_broken}, with condition {condition_score} and {geographic_score}')
             return probability_broken
         else:
             self.state = Bridge.State.HEALED
-            print(f'Healed with probability {probability_broken}, with condition {condition_score} and {geographic_score}')
+            #print(f'Healed with probability {probability_broken}, with condition {condition_score} and {geographic_score}')
             return probability_broken
 
 
@@ -181,7 +183,7 @@ class Sink(Infra):
     def remove(self, vehicle):
         self.model.schedule.remove(vehicle)
         self.vehicle_removed_toggle = not self.vehicle_removed_toggle
-        print(str(self) + ' REMOVE ' + str(vehicle))
+        #print(str(self) + ' REMOVE ' + str(vehicle))
 
 
 # ---------------------------------------------------------------
@@ -228,7 +230,7 @@ class Source(Infra):
                 Source.truck_counter += 1
                 self.vehicle_count += 1
                 self.vehicle_generated_flag = True
-                print(str(self) + " GENERATE " + str(agent))
+                #print(str(self) + " GENERATE " + str(agent))
         except Exception as e:
             print("Oops!", e.__class__, "occurred.")
 
@@ -382,7 +384,7 @@ class Vehicle(Agent):
             self.location.remove(self)
             return
         elif isinstance(next_infra, Bridge):
-            if next_infra.State == Bridge.State.BROKEN:
+            if next_infra.state == Bridge.State.BROKEN:
                 self.waiting_time = next_infra.get_delay_time()
                 print(f"Delay time assigned: {self.waiting_time}")
                 print(f"Bridge total_delay: {next_infra.total_delay}")
