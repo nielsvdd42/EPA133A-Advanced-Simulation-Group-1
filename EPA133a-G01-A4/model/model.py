@@ -64,8 +64,9 @@ class BangladeshModel(Model):
 
     file_name = '../data/data_final_with_aadt_and_vulnerability.csv'
 
-    def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0, scenario={'w_water': 1.00, 'w_elevation': 0.00, 'w_cyclone':0.00}):
+    def __init__(self, seed=None, x_max=500, y_max=500, x_min=0, y_min=0, scenario={'w_water': 1.00, 'w_elevation': 0.00, 'w_cyclone':1.00}):
 
+        self.sink_weights = None
         self.schedule = BaseScheduler(self)
         self.running = True
         self.path_ids_dict = defaultdict(lambda: pd.Series())
@@ -87,7 +88,9 @@ class BangladeshModel(Model):
         self.min_cycl = 0
 
         self.datacollector = DataCollector(
-            model_reporters={"Average_Driving_Time": compute_avg_driving_time}
+            model_reporters={"Average_Driving_Time": compute_avg_driving_time},
+            agent_reporters = {"Total_Delay": lambda a: a.total_delay if isinstance(a, Bridge) else 0}
+
         )
 
     def generate_model(self):
@@ -182,7 +185,7 @@ class BangladeshModel(Model):
                     self.space.place_agent(agent, (x, y))
                     agent.pos = (x, y)
         self.generate_network(network_nodes)
-
+        
         agents = self.schedule.agents
         bridges = [agent for agent in agents if agent.__class__ == Bridge]
         water_distances = [bridge.water_dist for bridge in bridges]
@@ -200,6 +203,12 @@ class BangladeshModel(Model):
         for bridge in bridges:
             bridge.calculate_vulnerabilityscore()
             bridge.determine_brokenness(self.scenario)
+
+        self.sink_weights = {}
+        for df in df_objects_all:
+            for _, row in df.iterrows():
+                if row['model_type'].strip() == 'sourcesink':
+                    self.sink_weights[row['id']] = row['avg_truck_AADT']
 
     def generate_network(self, network_dict):
         """
@@ -246,11 +255,10 @@ class BangladeshModel(Model):
         Picks a random sink and generates the shortest path from the specified source to this sink.
         First looks up if a path has been generated before, otherwise generates new one from networkX model.
         """
-        while True:
-            # different source and sink
-            sink = self.random.choice(self.sinks)
-            if sink is not source:
-                break
+        candidate_sinks = [s for s in self.sinks if s != source]
+        weights = [self.sink_weights.get(s, 1) for s in candidate_sinks]  # fallback weight = 1
+
+        sink = self.random.choices(candidate_sinks, weights=weights, k=1)[0]
         if (source, sink) in self.path_ids_dict:
             return self.path_ids_dict[source, sink]
         else:
@@ -269,6 +277,12 @@ class BangladeshModel(Model):
         Advance the simulation by one step.
         """
         self.schedule.step()
+
+        # DEBUG: force evaluation AFTER all updates
+        for a in self.schedule.agents:
+            if isinstance(a, Bridge):
+                _ = a.total_delay  # force access
+
         self.datacollector.collect(self)
 
 
